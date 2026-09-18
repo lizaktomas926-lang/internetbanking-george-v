@@ -7,6 +7,7 @@ const MUTED: [number, number, number] = [110, 110, 118];
 const LINE: [number, number, number] = [222, 222, 228];
 
 let fontReady: Promise<void> | null = null;
+let base64 = "";
 
 async function ensureFont(doc: jsPDF) {
   if (!fontReady) {
@@ -25,8 +26,6 @@ async function ensureFont(doc: jsPDF) {
   doc.addFont("DejaVuSans.ttf", "DejaVu", "normal");
   doc.setFont("DejaVu", "normal");
 }
-
-let base64 = "";
 
 function eur(n: number) {
   return formatEur(n).replace(/\u00a0/g, " ");
