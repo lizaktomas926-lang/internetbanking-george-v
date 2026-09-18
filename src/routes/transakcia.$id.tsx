@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { FileDown } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
 import { formatDate, formatEur, useBank } from "@/lib/bank-store";
+import { exportReceipt } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/transakcia/$id")({
   head: () => ({
