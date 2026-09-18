@@ -10,11 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NovaPlatbaRouteImport } from './routes/nova-platba'
 import { Route as PlatbyRouteImport } from './routes/platby'
+import { Route as PrijatRouteImport } from './routes/prijat'
+import { Route as RozpocetRouteImport } from './routes/rozpocet'
+import { Route as SporenieRouteImport } from './routes/sporenie'
+import { Route as TransakciaIdRouteImport } from './routes/transakcia.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NovaPlatbaRoute = NovaPlatbaRouteImport.update({
+  id: '/nova-platba',
+  path: '/nova-platba',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlatbyRoute = PlatbyRouteImport.update({
@@ -22,31 +32,93 @@ const PlatbyRoute = PlatbyRouteImport.update({
   path: '/platby',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrijatRoute = PrijatRouteImport.update({
+  id: '/prijat',
+  path: '/prijat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RozpocetRoute = RozpocetRouteImport.update({
+  id: '/rozpocet',
+  path: '/rozpocet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SporenieRoute = SporenieRouteImport.update({
+  id: '/sporenie',
+  path: '/sporenie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransakciaIdRoute = TransakciaIdRouteImport.update({
+  id: '/transakcia/$id',
+  path: '/transakcia/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/nova-platba': typeof NovaPlatbaRoute
   '/platby': typeof PlatbyRoute
+  '/prijat': typeof PrijatRoute
+  '/rozpocet': typeof RozpocetRoute
+  '/sporenie': typeof SporenieRoute
+  '/transakcia/$id': typeof TransakciaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/nova-platba': typeof NovaPlatbaRoute
   '/platby': typeof PlatbyRoute
+  '/prijat': typeof PrijatRoute
+  '/rozpocet': typeof RozpocetRoute
+  '/sporenie': typeof SporenieRoute
+  '/transakcia/$id': typeof TransakciaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/nova-platba': typeof NovaPlatbaRoute
   '/platby': typeof PlatbyRoute
+  '/prijat': typeof PrijatRoute
+  '/rozpocet': typeof RozpocetRoute
+  '/sporenie': typeof SporenieRoute
+  '/transakcia/$id': typeof TransakciaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/platby'
+  fullPaths:
+    | '/'
+    | '/nova-platba'
+    | '/platby'
+    | '/prijat'
+    | '/rozpocet'
+    | '/sporenie'
+    | '/transakcia/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/platby'
-  id: '__root__' | '/' | '/platby'
+  to:
+    | '/'
+    | '/nova-platba'
+    | '/platby'
+    | '/prijat'
+    | '/rozpocet'
+    | '/sporenie'
+    | '/transakcia/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/nova-platba'
+    | '/platby'
+    | '/prijat'
+    | '/rozpocet'
+    | '/sporenie'
+    | '/transakcia/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  NovaPlatbaRoute: typeof NovaPlatbaRoute
   PlatbyRoute: typeof PlatbyRoute
+  PrijatRoute: typeof PrijatRoute
+  RozpocetRoute: typeof RozpocetRoute
+  SporenieRoute: typeof SporenieRoute
+  TransakciaIdRoute: typeof TransakciaIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nova-platba': {
+      id: '/nova-platba'
+      path: '/nova-platba'
+      fullPath: '/nova-platba'
+      preLoaderRoute: typeof NovaPlatbaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/platby': {
       id: '/platby'
       path: '/platby'
@@ -65,12 +144,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlatbyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prijat': {
+      id: '/prijat'
+      path: '/prijat'
+      fullPath: '/prijat'
+      preLoaderRoute: typeof PrijatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rozpocet': {
+      id: '/rozpocet'
+      path: '/rozpocet'
+      fullPath: '/rozpocet'
+      preLoaderRoute: typeof RozpocetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sporenie': {
+      id: '/sporenie'
+      path: '/sporenie'
+      fullPath: '/sporenie'
+      preLoaderRoute: typeof SporenieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transakcia/$id': {
+      id: '/transakcia/$id'
+      path: '/transakcia/$id'
+      fullPath: '/transakcia/$id'
+      preLoaderRoute: typeof TransakciaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  NovaPlatbaRoute: NovaPlatbaRoute,
   PlatbyRoute: PlatbyRoute,
+  PrijatRoute: PrijatRoute,
+  RozpocetRoute: RozpocetRoute,
+  SporenieRoute: SporenieRoute,
+  TransakciaIdRoute: TransakciaIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -22,7 +22,7 @@ function Prehlad() {
   const s = useBank();
   const total = balance(s);
   const { income, expense } = monthTotals(s);
-  const month = MONTHS[new Date().getUTCMonth()].toLowerCase();
+  const month = (MONTHS[new Date().getUTCMonth()] ?? "").toLowerCase();
   const goal = s.goals[0];
 
   return (

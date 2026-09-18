@@ -44,7 +44,7 @@ function NovaPlatba() {
       amount: Math.round(value * 100) / 100,
       date: new Date().toISOString(),
       category,
-      note: note.trim() || undefined,
+      ...(note.trim() ? { note: note.trim() } : {}),
     });
     navigate({ to: "/platby" });
   }
