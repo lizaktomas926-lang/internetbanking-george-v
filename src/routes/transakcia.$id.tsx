@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { FileDown } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
 import { formatDate, formatEur, useBank } from "@/lib/bank-store";
+import { exportReceipt } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/transakcia/$id")({
   head: () => ({
@@ -29,6 +32,7 @@ function Detail() {
   const { id } = Route.useParams();
   const s = useBank();
   const t = s.transactions.find((x) => x.id === id);
+  const [busy, setBusy] = useState(false);
 
   if (!t) {
     return (
@@ -72,6 +76,21 @@ function Detail() {
           {t.vs ? <Row label="Konštantný symbol" value={t.vs} /> : null}
           {t.note ? <Row label="Poznámka" value={t.note} /> : null}
         </section>
+
+        <button
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await exportReceipt(s, t);
+            } finally {
+              setBusy(false);
+            }
+          }}
+          disabled={busy}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-[14px] font-semibold text-primary-foreground disabled:opacity-60"
+        >
+          <FileDown className="size-4" /> {busy ? "Pripravujem…" : "Stiahnuť potvrdenie (PDF)"}
+        </button>
       </div>
     </AppShell>
   );

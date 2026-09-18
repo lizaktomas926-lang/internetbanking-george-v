@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, FileDown } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
 import { TxnRow } from "@/components/bank/TxnRow";
 import { balance, formatEur, groupByMonth, useBank } from "@/lib/bank-store";
+import { exportStatement } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/platby")({
   head: () => ({
@@ -30,6 +31,16 @@ function Platby() {
   const [filter, setFilter] = useState<"all" | "in" | "out">("all");
   const list = s.transactions.filter((t) => (filter === "all" ? true : t.type === filter));
   const groups = groupByMonth(list);
+  const [busy, setBusy] = useState(false);
+
+  async function download() {
+    setBusy(true);
+    try {
+      await exportStatement(s, list);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <AppShell>
@@ -41,6 +52,13 @@ function Platby() {
         <section className="rounded-3xl bg-surface p-5">
           <p className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">Účet</p>
           <p className="mt-1 text-[28px] font-bold leading-none">{formatEur(balance(s))}</p>
+          <button
+            onClick={download}
+            disabled={busy}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border py-2.5 text-[13px] font-semibold disabled:opacity-60"
+          >
+            <FileDown className="size-4" /> {busy ? "Pripravujem…" : "Stiahnuť PDF výpis"}
+          </button>
         </section>
 
         <div className="flex gap-2">
