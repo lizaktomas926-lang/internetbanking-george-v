@@ -42,7 +42,7 @@ export const CATEGORIES = [
   "Prevod",
 ];
 
-const KEY = "sk-banka-v1";
+const KEY = "sk-banka-v2";
 
 function iso(y: number, m: number, d: number) {
   return new Date(Date.UTC(y, m - 1, d, 10, 0, 0)).toISOString();
@@ -55,9 +55,10 @@ function seed(): BankState {
   const pm = m === 1 ? 12 : m - 1;
   const py = m === 1 ? y - 1 : y;
   return {
-    owner: "Tomáš Lizák",
+    owner: "Jakub Varga",
     iban: "SK31 1200 0000 1987 4263 7541",
     transactions: [
+      { id: "t0", type: "in", counterparty: "Počiatočný zostatok", amount: 41098.5, date: iso(py, pm, 1), category: "Ostatné príjmy" },
       { id: "t1", type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(y, m, 5), category: "Mzda", vs: "0100" },
       { id: "t2", type: "out", counterparty: "Billa", amount: 68.4, date: iso(y, m, 7), category: "Potraviny" },
       { id: "t3", type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(y, m, 8), category: "Bývanie" },
