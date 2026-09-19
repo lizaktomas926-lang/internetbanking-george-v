@@ -115,8 +115,9 @@ export function useBank() {
   useEffect(() => {
     const l = () => force((n) => n + 1);
     listeners.add(l);
-    hydrate();
+    const timer = window.setTimeout(hydrate, 0);
     return () => {
+      window.clearTimeout(timer);
       listeners.delete(l);
     };
   }, []);
