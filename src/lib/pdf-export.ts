@@ -61,7 +61,7 @@ function footer(doc: jsPDF) {
     doc.setFontSize(8);
     doc.setTextColor(...MUTED);
     doc.text(
-      `Dokument vygenerovaný ${formatDate(new Date().toISOString())} · George · Slovenská sporiteľňa strana ${p}/${pages}`,
+      `Dokument vygenerovaný ${formatDate(new Date().toISOString())} · George · Slovenská sporiteľňa · strana ${p}/${pages}`,
       16,
       288,
     );
