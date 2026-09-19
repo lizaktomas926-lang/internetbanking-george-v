@@ -1,8 +1,7 @@
 import { jsPDF } from "jspdf";
 import fontUrl from "@/assets/DejaVuSans.ttf?url";
-import { balance, formatDate, formatEur, MONTHS, type BankState, type Txn } from "./bank-store";
+import { balance, formatDate, type BankState, type Txn } from "./bank-store";
 
-const BRAND: [number, number, number] = [92, 15, 27];
 const MUTED: [number, number, number] = [110, 110, 118];
 const LINE: [number, number, number] = [222, 222, 228];
 
@@ -25,10 +24,6 @@ async function ensureFont(doc: jsPDF) {
   doc.addFileToVFS("DejaVuSans.ttf", base64);
   doc.addFont("DejaVuSans.ttf", "DejaVu", "normal");
   doc.setFont("DejaVu", "normal");
-}
-
-function eur(n: number) {
-  return formatEur(n).replace(/\u00a0/g, " ");
 }
 
 /** Spoľahlivé uloženie PDF aj na iOS Safari / PWA, kde doc.save() zlyháva. */
@@ -54,20 +49,6 @@ function savePdf(doc: jsPDF, filename: string) {
     window.open(url, "_blank");
   }
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
-function footer(doc: jsPDF) {
-  const pages = doc.getNumberOfPages();
-  for (let p = 1; p <= pages; p += 1) {
-    doc.setPage(p);
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED);
-    doc.text(
-      `Dokument vygenerovaný ${formatDate(new Date().toISOString())} · George · Slovenská sporiteľňa · strana ${p}/${pages}`,
-      16,
-      288,
-    );
-  }
 }
 
 /** Potvrdenie o jednej platbe – rovnaký bankový štýl ako výpis z účtu */
