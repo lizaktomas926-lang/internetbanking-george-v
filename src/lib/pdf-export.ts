@@ -187,7 +187,7 @@ export async function exportStatement(s: BankState, txns: Txn[] = s.transactions
   row(doc, R, W, y, "Konečný stav Účtu", num(end));
 
   // tabuľka
-  y = 122;
+  y = 132;
   doc.setFillColor(...BOXBG);
   doc.roundedRect(14, y - 6, 182, 14, 2, 2, "F");
   doc.setFontSize(8);
