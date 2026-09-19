@@ -353,5 +353,5 @@ export async function exportStatement(s: BankState, txns: Txn[] = s.transactions
     doc.text("www.mojabanka.sk", 180, 288, { align: "right" });
   }
 
-  doc.save(`vypis-${s.owner.toLowerCase().replace(/\s+/g, "-")}.pdf`);
+  savePdf(doc, `vypis-${s.owner.toLowerCase().replace(/\s+/g, "-")}.pdf`);
 }
