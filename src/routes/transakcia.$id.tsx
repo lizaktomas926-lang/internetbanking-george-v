@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { FileDown } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/bank/AppShell";
 import { formatDate, formatEur, useBank } from "@/lib/bank-store";
 import { exportReceipt } from "@/lib/pdf-export";
@@ -82,6 +83,10 @@ function Detail() {
             setBusy(true);
             try {
               await exportReceipt(s, t);
+              toast.success("Potvrdenie o platbe bolo stiahnuté");
+            } catch (e) {
+              console.error(e);
+              toast.error("Potvrdenie sa nepodarilo vytvoriť. Skúste to prosím znova.");
             } finally {
               setBusy(false);
             }
