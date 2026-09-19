@@ -111,17 +111,17 @@ export function hydrate() {
 }
 
 export function useBank() {
-  const [, force] = useState(0);
+  const [snap, setSnap] = useState<BankState>(state);
   useEffect(() => {
-    const l = () => force((n) => n + 1);
+    const l = () => setSnap({ ...state });
     listeners.add(l);
-    const timer = window.setTimeout(hydrate, 0);
+    hydrate();
+    l();
     return () => {
-      window.clearTimeout(timer);
       listeners.delete(l);
     };
   }, []);
-  return state;
+  return snap;
 }
 
 export function addTransaction(t: Omit<Txn, "id">) {
