@@ -61,7 +61,7 @@ function footer(doc: jsPDF) {
     doc.setFontSize(8);
     doc.setTextColor(...MUTED);
     doc.text(
-      `Dokument vygenerovaný ${formatDate(new Date().toISOString())} · Moja banka · strana ${p}/${pages}`,
+      `Dokument vygenerovaný ${formatDate(new Date().toISOString())} · George · Slovenská sporiteľňa · strana ${p}/${pages}`,
       16,
       288,
     );
@@ -141,10 +141,10 @@ export async function exportStatement(s: BankState, txns: Txn[] = s.transactions
   // hlavička
   doc.setTextColor(...INK);
   doc.setFontSize(20);
-  doc.text("MOJA BANKA", 14, 24);
+  doc.text("GEORGE", 14, 24);
   doc.setFontSize(9);
   doc.setTextColor(...MUTED);
-  doc.text("osobné bankovníctvo", 14, 30);
+  doc.text("Slovenská sporiteľňa", 14, 30);
   doc.setFontSize(9.5);
   doc.setTextColor(...INK);
   doc.text(`č. ${new Date(today).getUTCFullYear()}/1 - Strana 1/1`, 196, 24, { align: "right" });
@@ -152,7 +152,7 @@ export async function exportStatement(s: BankState, txns: Txn[] = s.transactions
   doc.setFontSize(7.5);
   doc.setTextColor(...MUTED);
   doc.text(
-    ["Moja banka, a.s.", "Tomášikova 48, 832 37 Bratislava", "IČO 00 151 653, zapísaná v Obchodnom registri"],
+    ["Slovenská sporiteľňa, a.s.", "Tomášikova 48, 832 37 Bratislava", "IČO 00 151 653, zapísaná v Obchodnom registri"],
     14,
     40,
   );

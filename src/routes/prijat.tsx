@@ -6,9 +6,9 @@ import { addTransaction, CATEGORIES, useBank } from "@/lib/bank-store";
 export const Route = createFileRoute("/prijat")({
   head: () => ({
     meta: [
-      { title: "Prijatý prevod | Moja banka" },
+      { title: "Prijatý prevod | George" },
       { name: "description", content: "Zaevidujte prijatý prevod alebo zdieľajte svoj IBAN pre platbu." },
-      { property: "og:title", content: "Prijatý prevod | Moja banka" },
+      { property: "og:title", content: "Prijatý prevod | George" },
       { property: "og:description", content: "Zaevidujte prijatý prevod alebo zdieľajte svoj IBAN pre platbu." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

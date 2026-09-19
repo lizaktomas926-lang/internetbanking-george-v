@@ -57,7 +57,7 @@ export function BrandHeader({
             ←
           </Link>
         ) : (
-          <span className="text-[13px] font-medium opacity-80">Dobrý deň</span>
+          <span className="text-[13px] font-semibold tracking-wide opacity-90">George · Dobrý deň</span>
         )}
         {action}
       </div>

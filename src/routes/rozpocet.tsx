@@ -16,9 +16,9 @@ import {
 export const Route = createFileRoute("/rozpocet")({
   head: () => ({
     meta: [
-      { title: "Rozpočet príjmov a výdavkov | Moja banka" },
+      { title: "Rozpočet príjmov a výdavkov | George" },
       { name: "description", content: "Mesačný rozpočet: limity kategórií, príjmy, výdavky a zostatok." },
-      { property: "og:title", content: "Rozpočet príjmov a výdavkov | Moja banka" },
+      { property: "og:title", content: "Rozpočet príjmov a výdavkov | George" },
       { property: "og:description", content: "Mesačný rozpočet: limity kategórií, príjmy, výdavky a zostatok." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

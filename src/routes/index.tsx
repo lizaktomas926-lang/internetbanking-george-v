@@ -7,9 +7,9 @@ import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-sto
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Prehľad účtu | Moja banka" },
+      { title: "Prehľad účtu | George" },
       { name: "description", content: "Zostatok, príjmy a výdavky, sporenie a rozpočet na jednom mieste." },
-      { property: "og:title", content: "Prehľad účtu | Moja banka" },
+      { property: "og:title", content: "Prehľad účtu | George" },
       { property: "og:description", content: "Zostatok, príjmy a výdavky, sporenie a rozpočet na jednom mieste." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -28,7 +28,7 @@ function Prehlad() {
   return (
     <AppShell>
       <header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
-        <p className="text-[13px] font-medium opacity-80">Dobrý deň</p>
+        <p className="text-[13px] font-semibold tracking-wide opacity-90">George · Dobrý deň</p>
         <h1 className="mt-1 text-[34px] font-bold leading-none">Prehľad</h1>
         <p className="mt-2 text-sm opacity-80">{s.owner}</p>
       </header>

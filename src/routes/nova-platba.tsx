@@ -6,9 +6,9 @@ import { addTransaction, balance, CATEGORIES, formatEur, useBank } from "@/lib/b
 export const Route = createFileRoute("/nova-platba")({
   head: () => ({
     meta: [
-      { title: "Nová platba | Moja banka" },
+      { title: "Nová platba | George" },
       { name: "description", content: "Zadajte prevod na IBAN príjemcu, sumu a správu pre príjemcu." },
-      { property: "og:title", content: "Nová platba | Moja banka" },
+      { property: "og:title", content: "Nová platba | George" },
       { property: "og:description", content: "Zadajte prevod na IBAN príjemcu, sumu a správu pre príjemcu." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
