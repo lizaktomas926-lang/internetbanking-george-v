@@ -6,9 +6,9 @@ import { addGoal, depositToGoal, formatEur, useBank } from "@/lib/bank-store";
 export const Route = createFileRoute("/sporenie")({
   head: () => ({
     meta: [
-      { title: "Sporenie a ciele | Moja banka" },
+      { title: "Sporenie a ciele | George" },
       { name: "description", content: "Sporiace ciele, vklady a priebeh sporenia v eurách." },
-      { property: "og:title", content: "Sporenie a ciele | Moja banka" },
+      { property: "og:title", content: "Sporenie a ciele | George" },
       { property: "og:description", content: "Sporiace ciele, vklady a priebeh sporenia v eurách." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

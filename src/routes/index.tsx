@@ -7,9 +7,9 @@ import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-sto
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Prehľad účtu | Moja banka" },
+      { title: "Prehľad účtu | George" },
       { name: "description", content: "Zostatok, príjmy a výdavky, sporenie a rozpočet na jednom mieste." },
-      { property: "og:title", content: "Prehľad účtu | Moja banka" },
+      { property: "og:title", content: "Prehľad účtu | George" },
       { property: "og:description", content: "Zostatok, príjmy a výdavky, sporenie a rozpočet na jednom mieste." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

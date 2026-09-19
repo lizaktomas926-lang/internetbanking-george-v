@@ -9,9 +9,9 @@ import { exportStatement } from "@/lib/pdf-export";
 export const Route = createFileRoute("/platby")({
   head: () => ({
     meta: [
-      { title: "História platieb | Moja banka" },
+      { title: "História platieb | George" },
       { name: "description", content: "Všetky odoslané a prijaté prevody zoradené po mesiacoch." },
-      { property: "og:title", content: "História platieb | Moja banka" },
+      { property: "og:title", content: "História platieb | George" },
       { property: "og:description", content: "Všetky odoslané a prijaté prevody zoradené po mesiacoch." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

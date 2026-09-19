@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Moja banka" },
+      { title: "George · Slovenská sporiteľňa" },
       { name: "description", content: "Prevody, história platieb, sporenie a rozpočet v jednej aplikácii." },
-      { property: "og:title", content: "Moja banka" },
+      { property: "og:title", content: "George · Slovenská sporiteľňa" },
       { property: "og:description", content: "Prevody, história platieb, sporenie a rozpočet v jednej aplikácii." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
