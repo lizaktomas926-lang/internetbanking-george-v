@@ -28,7 +28,7 @@ function Prehlad() {
   return (
     <AppShell>
       <header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
-        <p className="text-[13px] font-medium opacity-80">Dobrý deň</p>
+        <p className="text-[13px] font-semibold tracking-wide opacity-90">George · Dobrý deň</p>
         <h1 className="mt-1 text-[34px] font-bold leading-none">Prehľad</h1>
         <p className="mt-2 text-sm opacity-80">{s.owner}</p>
       </header>
