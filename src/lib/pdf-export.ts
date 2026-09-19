@@ -70,31 +70,122 @@ function footer(doc: jsPDF) {
   }
 }
 
-/** Potvrdenie o jednej platbe */
+/** Potvrdenie o jednej platbe – rovnaký bankový štýl ako výpis z účtu */
 export async function exportReceipt(s: BankState, t: Txn) {
   const doc = new jsPDF();
   await ensureFont(doc);
   const income = t.type === "in";
+  const today = new Date().toISOString();
 
-  header(doc, "Potvrdenie o platbe", income ? "Prijatý prevod" : "Odoslaná platba");
+  // hlavička
+  doc.setTextColor(...INK);
+  doc.setFontSize(20);
+  doc.text("GEORGE", 14, 24);
+  doc.setFontSize(9);
+  doc.setTextColor(...MUTED);
+  doc.text("Slovenská sporiteľňa", 14, 30);
+  doc.setFontSize(9.5);
+  doc.setTextColor(...INK);
+  doc.text("Potvrdenie č. " + t.id.slice(0, 10).toUpperCase(), 196, 24, { align: "right" });
 
-  doc.setFontSize(26);
-  doc.text(`${income ? "+" : "−"}${eur(t.amount).replace("-", "")}`, 16, 60);
+  doc.setFontSize(7.5);
+  doc.setTextColor(...MUTED);
+  doc.text(
+    ["Slovenská sporiteľňa, a.s.", "Tomášikova 48, 832 37 Bratislava", "IČO 00 151 653, zapísaná v Obchodnom registri"],
+    14,
+    40,
+  );
+  doc.setFontSize(10);
+  doc.setTextColor(...INK);
+  doc.text([s.owner, "Slovenská republika"], 110, 40);
 
-  let y = 74;
-  y = labelValue(doc, "Majiteľ účtu", s.owner, y);
-  y = labelValue(doc, income ? "Prijaté na účet" : "Odoslané z účtu", s.iban, y);
-  y = labelValue(doc, income ? "Odosielateľ" : "Príjemca", t.counterparty, y);
-  if (t.iban) y = labelValue(doc, "IBAN protistrany", t.iban, y);
-  y = labelValue(doc, "Dátum spracovania", formatDate(t.date), y);
-  y = labelValue(doc, "Kategória", t.category, y);
-  if (t.vs) y = labelValue(doc, "Konštantný symbol", t.vs, y);
-  if (t.note) y = labelValue(doc, "Správa pre príjemcu", t.note, y);
-  y = labelValue(doc, "Referencia platby", t.id.slice(0, 18).toUpperCase(), y);
-  labelValue(doc, "Zostatok na účte", eur(balance(s)), y);
+  doc.setFontSize(14);
+  doc.text(income ? "Potvrdenie o prijatej platbe" : "Potvrdenie o vykonanej platbe", 14, 62);
 
-  footer(doc);
-  doc.save(`potvrdenie-${formatDate(t.date).replace(/\./g, "")}.pdf`);
+  // suma
+  doc.setFillColor(...BOXBG);
+  doc.roundedRect(14, 68, 182, 24, 2, 2, "F");
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  doc.text("Suma transakcie", 18, 76);
+  doc.setFontSize(20);
+  doc.setTextColor(...INK);
+  doc.text(`${income ? "+" : "-"} ${num(t.amount)} EUR`, 18, 87);
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  doc.text("Stav", 192, 76, { align: "right" });
+  doc.setFontSize(11);
+  doc.setTextColor(...INK);
+  doc.text("Zrealizované", 192, 84, { align: "right" });
+
+  // údaje o platbe
+  doc.setFillColor(...BOXBG);
+  doc.roundedRect(14, 98, 182, 62, 2, 2, "F");
+  let y = 106;
+  const L = 16;
+  const R = 106;
+  const W = 86;
+  row(doc, L, W, y, "Názov Účtu", s.owner);
+  row(doc, R, W, y, income ? "Odosielateľ" : "Príjemca", t.counterparty);
+  y += 9;
+  row(doc, L, W, y, "Číslo Účtu", s.iban);
+  row(doc, R, W, y, "IBAN protistrany", t.iban || "—");
+  y += 9;
+  row(doc, L, W, y, "BIC", "MOJASKBX");
+  row(doc, R, W, y, "Konštantný symbol", t.vs || "—");
+  y += 9;
+  row(doc, L, W, y, "Mena", "EUR");
+  row(doc, R, W, y, "Kategória", t.category);
+  y += 9;
+  row(doc, L, W, y, "Dátum zúčtovania", formatDate(t.date));
+  row(doc, R, W, y, "Dátum valuty", formatDate(t.date));
+  y += 9;
+  row(doc, L, W, y, "Dátum vyhotovenia", formatDate(today));
+  row(doc, R, W, y, "Zostatok na Účte", num(balance(s)));
+
+  // správa pre príjemcu
+  y = 172;
+  doc.setFontSize(9);
+  doc.setTextColor(...INK);
+  doc.text("Správa pre príjemcu:", 14, y);
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  doc.text(doc.splitTextToSize(t.note || "—", 182), 14, y + 6);
+
+  // poznámka
+  y += 22;
+  doc.setFontSize(9);
+  doc.setTextColor(...INK);
+  doc.text("Poznámka:", 14, y);
+  doc.setFontSize(8);
+  doc.setTextColor(...MUTED);
+  doc.text(
+    doc.splitTextToSize(
+      "Toto potvrdenie je vygenerované elektronicky a je platné bez podpisu a pečiatky. Ak pri transakcii nie je uvedená výška poplatku, banka takúto transakciu nespoplatňuje alebo je poplatok zahrnutý v poplatku za iný bankový produkt.",
+      182,
+    ),
+    14,
+    y + 6,
+  );
+  doc.setFillColor(...BOXBG);
+  doc.roundedRect(14, y + 26, 182, 16, 2, 2, "F");
+  doc.setTextColor(...INK);
+  doc.text(
+    doc.splitTextToSize(
+      "Vklad podliehajúci ochrane vkladov v súlade so zákonom. Viac informácií získate v Informačnom formulári pre vkladateľa.",
+      174,
+    ),
+    18,
+    y + 33,
+  );
+
+  doc.setFontSize(8.5);
+  doc.setTextColor(...INK);
+  doc.text("info@mojabanka.sk", 30, 288);
+  doc.text("Klientske centrum: 0850 111 888", 105, 288, { align: "center" });
+  doc.text("www.mojabanka.sk", 180, 288, { align: "right" });
+
+  savePdf(doc, `potvrdenie-o-platbe-${t.id.slice(0, 8)}.pdf`);
 }
 
 /* ---------- Výpis z účtu v štýle bankového výpisu ---------- */
