@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, FileDown } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/bank/AppShell";
 import { TxnRow } from "@/components/bank/TxnRow";
 import { balance, formatEur, groupByMonth, useBank } from "@/lib/bank-store";
@@ -37,6 +38,10 @@ function Platby() {
     setBusy(true);
     try {
       await exportStatement(s, list);
+      toast.success("PDF výpis bol stiahnutý");
+    } catch (e) {
+      console.error(e);
+      toast.error("Výpis sa nepodarilo vytvoriť. Skúste to prosím znova.");
     } finally {
       setBusy(false);
     }
