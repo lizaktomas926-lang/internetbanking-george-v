@@ -31,27 +31,29 @@ function eur(n: number) {
   return formatEur(n).replace(/\u00a0/g, " ");
 }
 
-function header(doc: jsPDF, title: string, subtitle: string) {
-  doc.setFillColor(...BRAND);
-  doc.rect(0, 0, 210, 42, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
-  doc.text(title, 16, 22);
-  doc.setFontSize(10);
-  doc.text(subtitle, 16, 31);
-  doc.setTextColor(20, 20, 24);
-}
-
-function labelValue(doc: jsPDF, label: string, value: string, y: number) {
-  doc.setFontSize(9);
-  doc.setTextColor(...MUTED);
-  doc.text(label, 16, y);
-  doc.setFontSize(12);
-  doc.setTextColor(20, 20, 24);
-  doc.text(value, 16, y + 6);
-  doc.setDrawColor(...LINE);
-  doc.line(16, y + 10, 194, y + 10);
-  return y + 18;
+/** Spoľahlivé uloženie PDF aj na iOS Safari / PWA, kde doc.save() zlyháva. */
+function savePdf(doc: jsPDF, filename: string) {
+  const blob = doc.output("blob");
+  const nav = navigator as Navigator & { msSaveOrOpenBlob?: (b: Blob, n: string) => void };
+  if (typeof nav.msSaveOrOpenBlob === "function") {
+    nav.msSaveOrOpenBlob(blob, filename);
+    return;
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const supportsDownload = "download" in a;
+  a.href = url;
+  a.download = filename;
+  a.rel = "noopener";
+  a.target = "_blank";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  if (!supportsDownload) {
+    // starší iOS Safari: otvoriť v novom okne, ak klik nespôsobil navigáciu
+    window.open(url, "_blank");
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 function footer(doc: jsPDF) {
