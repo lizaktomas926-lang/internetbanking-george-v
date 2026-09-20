@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedNastaveniaRouteImport } from './routes/_authenticated/nastavenia'
 import { Route as AuthenticatedNovaPlatbaRouteImport } from './routes/_authenticated/nova-platba'
@@ -18,59 +20,70 @@ import { Route as AuthenticatedRozpocetRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSporenieRouteImport } from './routes/_authenticated/sporenie'
 import { Route as AuthenticatedTransakciaIdRouteImport } from './routes/_authenticated/transakcia.$id'
 
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/_authenticated/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNastaveniaRoute = AuthenticatedNastaveniaRouteImport.update({
-  id: '/_authenticated/nastavenia',
+  id: '/nastavenia',
   path: '/nastavenia',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNovaPlatbaRoute = AuthenticatedNovaPlatbaRouteImport.update({
-  id: '/_authenticated/nova-platba',
+  id: '/nova-platba',
   path: '/nova-platba',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPlatbyRoute = AuthenticatedPlatbyRouteImport.update({
-  id: '/_authenticated/platby',
+  id: '/platby',
   path: '/platby',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPrijatRoute = AuthenticatedPrijatRouteImport.update({
-  id: '/_authenticated/prijat',
+  id: '/prijat',
   path: '/prijat',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRozpocetRoute = AuthenticatedRozpocetRouteImport.update({
-  id: '/_authenticated/rozpocet',
+  id: '/rozpocet',
   path: '/rozpocet',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSporenieRoute = AuthenticatedSporenieRouteImport.update({
-  id: '/_authenticated/sporenie',
+  id: '/sporenie',
   path: '/sporenie',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTransakciaIdRoute =
   AuthenticatedTransakciaIdRouteImport.update({
-    id: '/_authenticated/transakcia/$id',
+    id: '/transakcia/$id',
     path: '/transakcia/$id',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
   '/nastavenia': typeof AuthenticatedNastaveniaRoute
   '/nova-platba': typeof AuthenticatedNovaPlatbaRoute
   '/platby': typeof AuthenticatedPlatbyRoute
   '/prijat': typeof AuthenticatedPrijatRoute
   '/rozpocet': typeof AuthenticatedRozpocetRoute
   '/sporenie': typeof AuthenticatedSporenieRoute
-  '/': typeof AuthenticatedIndexRoute
   '/transakcia/$id': typeof AuthenticatedTransakciaIdRoute
 }
 export interface FileRoutesByTo {
+  '/auth': typeof AuthRoute
   '/nastavenia': typeof AuthenticatedNastaveniaRoute
   '/nova-platba': typeof AuthenticatedNovaPlatbaRoute
   '/platby': typeof AuthenticatedPlatbyRoute
@@ -82,6 +95,8 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/_authenticated/nastavenia': typeof AuthenticatedNastaveniaRoute
   '/_authenticated/nova-platba': typeof AuthenticatedNovaPlatbaRoute
   '/_authenticated/platby': typeof AuthenticatedPlatbyRoute
@@ -94,16 +109,18 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
+    | '/auth'
     | '/nastavenia'
     | '/nova-platba'
     | '/platby'
     | '/prijat'
     | '/rozpocet'
     | '/sporenie'
-    | '/'
     | '/transakcia/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/auth'
     | '/nastavenia'
     | '/nova-platba'
     | '/platby'
@@ -114,6 +131,8 @@ export interface FileRouteTypes {
     | '/transakcia/$id'
   id:
     | '__root__'
+    | '/_authenticated'
+    | '/auth'
     | '/_authenticated/nastavenia'
     | '/_authenticated/nova-platba'
     | '/_authenticated/platby'
@@ -125,6 +144,86 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nastavenia': {
+      id: '/_authenticated/nastavenia'
+      path: '/nastavenia'
+      fullPath: '/nastavenia'
+      preLoaderRoute: typeof AuthenticatedNastaveniaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nova-platba': {
+      id: '/_authenticated/nova-platba'
+      path: '/nova-platba'
+      fullPath: '/nova-platba'
+      preLoaderRoute: typeof AuthenticatedNovaPlatbaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/platby': {
+      id: '/_authenticated/platby'
+      path: '/platby'
+      fullPath: '/platby'
+      preLoaderRoute: typeof AuthenticatedPlatbyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/prijat': {
+      id: '/_authenticated/prijat'
+      path: '/prijat'
+      fullPath: '/prijat'
+      preLoaderRoute: typeof AuthenticatedPrijatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rozpocet': {
+      id: '/_authenticated/rozpocet'
+      path: '/rozpocet'
+      fullPath: '/rozpocet'
+      preLoaderRoute: typeof AuthenticatedRozpocetRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sporenie': {
+      id: '/_authenticated/sporenie'
+      path: '/sporenie'
+      fullPath: '/sporenie'
+      preLoaderRoute: typeof AuthenticatedSporenieRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/transakcia/$id': {
+      id: '/_authenticated/transakcia/$id'
+      path: '/transakcia/$id'
+      fullPath: '/transakcia/$id'
+      preLoaderRoute: typeof AuthenticatedTransakciaIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+  }
+}
+
+interface AuthenticatedRouteRouteChildren {
   AuthenticatedNastaveniaRoute: typeof AuthenticatedNastaveniaRoute
   AuthenticatedNovaPlatbaRoute: typeof AuthenticatedNovaPlatbaRoute
   AuthenticatedPlatbyRoute: typeof AuthenticatedPlatbyRoute
@@ -135,68 +234,7 @@ export interface RootRouteChildren {
   AuthenticatedTransakciaIdRoute: typeof AuthenticatedTransakciaIdRoute
 }
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/nastavenia': {
-      id: '/_authenticated/nastavenia'
-      path: '/nastavenia'
-      fullPath: '/nastavenia'
-      preLoaderRoute: typeof AuthenticatedNastaveniaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/nova-platba': {
-      id: '/_authenticated/nova-platba'
-      path: '/nova-platba'
-      fullPath: '/nova-platba'
-      preLoaderRoute: typeof AuthenticatedNovaPlatbaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/platby': {
-      id: '/_authenticated/platby'
-      path: '/platby'
-      fullPath: '/platby'
-      preLoaderRoute: typeof AuthenticatedPlatbyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/prijat': {
-      id: '/_authenticated/prijat'
-      path: '/prijat'
-      fullPath: '/prijat'
-      preLoaderRoute: typeof AuthenticatedPrijatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/rozpocet': {
-      id: '/_authenticated/rozpocet'
-      path: '/rozpocet'
-      fullPath: '/rozpocet'
-      preLoaderRoute: typeof AuthenticatedRozpocetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/sporenie': {
-      id: '/_authenticated/sporenie'
-      path: '/sporenie'
-      fullPath: '/sporenie'
-      preLoaderRoute: typeof AuthenticatedSporenieRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/transakcia/$id': {
-      id: '/_authenticated/transakcia/$id'
-      path: '/transakcia/$id'
-      fullPath: '/transakcia/$id'
-      preLoaderRoute: typeof AuthenticatedTransakciaIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
-}
-
-const rootRouteChildren: RootRouteChildren = {
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNastaveniaRoute: AuthenticatedNastaveniaRoute,
   AuthenticatedNovaPlatbaRoute: AuthenticatedNovaPlatbaRoute,
   AuthenticatedPlatbyRoute: AuthenticatedPlatbyRoute,
@@ -205,6 +243,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedSporenieRoute: AuthenticatedSporenieRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedTransakciaIdRoute: AuthenticatedTransakciaIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
