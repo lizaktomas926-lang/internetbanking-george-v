@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      budgets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          limit_amount: number
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          limit_amount?: number
+          user_id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          limit_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          saved: number
+          target: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          saved?: number
+          target?: number
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          saved?: number
+          target?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          iban: string
+          id: string
+          owner: string
+          seeded: boolean
+        }
+        Insert: {
+          created_at?: string
+          iban?: string
+          id: string
+          owner?: string
+          seeded?: boolean
+        }
+        Update: {
+          created_at?: string
+          iban?: string
+          id?: string
+          owner?: string
+          seeded?: boolean
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string
+          counterparty: string
+          created_at: string
+          date: string
+          iban: string | null
+          id: string
+          note: string | null
+          type: string
+          user_id: string
+          vs: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string
+          counterparty: string
+          created_at?: string
+          date?: string
+          iban?: string | null
+          id?: string
+          note?: string | null
+          type: string
+          user_id?: string
+          vs?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          counterparty?: string
+          created_at?: string
+          date?: string
+          iban?: string | null
+          id?: string
+          note?: string | null
+          type?: string
+          user_id?: string
+          vs?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
