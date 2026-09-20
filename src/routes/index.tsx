@@ -7,10 +7,10 @@ import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-sto
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Prehľad účtu | George" },
-      { name: "description", content: "Zostatok, príjmy a výdavky, sporenie a rozpočet na jednom mieste." },
-      { property: "og:title", content: "Prehľad účtu | George" },
-      { property: "og:description", content: "Zostatok, príjmy a výdavky, sporenie a rozpočet na jednom mieste." },
+      { title: "Internetbanking George" },
+      { name: "description", content: "Chceme byť spoľahlivý partner pre vaše peniaze, aby ste sa mohli tešiť na budúcnosť." },
+      { property: "og:title", content: "Internetbanking George" },
+      { property: "og:description", content: "Chceme byť spoľahlivý partner pre vaše peniaze, aby ste sa mohli tešiť na budúcnosť." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
