@@ -13,7 +13,7 @@ import {
   useBank,
 } from "@/lib/bank-store";
 
-export const Route = createFileRoute("/rozpocet")({
+export const Route = createFileRoute("/_authenticated/rozpocet")({
   head: () => ({
     meta: [
       { title: "Rozpočet príjmov a výdavkov | George" },

@@ -10,7 +10,7 @@ import {
 } from "@/lib/bank-store";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/nova-platba")({
+export const Route = createFileRoute("/_authenticated/nova-platba")({
   head: () => ({
     meta: [
       { title: "Nová platba | George" },

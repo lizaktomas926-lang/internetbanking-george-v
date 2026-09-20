@@ -7,7 +7,7 @@ import { TxnRow } from "@/components/bank/TxnRow";
 import { balance, formatEur, groupByMonth, useBank } from "@/lib/bank-store";
 import { exportStatement } from "@/lib/pdf-export";
 
-export const Route = createFileRoute("/platby")({
+export const Route = createFileRoute("/_authenticated/platby")({
   head: () => ({
     meta: [
       { title: "História platieb | George" },
