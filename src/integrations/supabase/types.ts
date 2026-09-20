@@ -65,6 +65,63 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_settings: {
+        Row: {
+          created_at: string
+          on_budget: boolean
+          on_incoming: boolean
+          on_outgoing: boolean
+          sound_enabled: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          on_budget?: boolean
+          on_incoming?: boolean
+          on_outgoing?: boolean
+          sound_enabled?: boolean
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          on_budget?: boolean
+          on_incoming?: boolean
+          on_outgoing?: boolean
+          sound_enabled?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind: string
+          read?: boolean
+          title: string
+          user_id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

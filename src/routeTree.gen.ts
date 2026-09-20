@@ -18,6 +18,7 @@ import { Route as AuthenticatedPlatbyRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPrijatRouteImport } from './routes/_authenticated/prijat'
 import { Route as AuthenticatedRozpocetRouteImport } from './routes/_authenticated/rozpocet'
 import { Route as AuthenticatedSporenieRouteImport } from './routes/_authenticated/sporenie'
+import { Route as AuthenticatedUpozorneniaRouteImport } from './routes/_authenticated/upozornenia'
 import { Route as AuthenticatedTransakciaIdRouteImport } from './routes/_authenticated/transakcia.$id'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -64,6 +65,12 @@ const AuthenticatedSporenieRoute = AuthenticatedSporenieRouteImport.update({
   path: '/sporenie',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedUpozorneniaRoute =
+  AuthenticatedUpozorneniaRouteImport.update({
+    id: '/upozornenia',
+    path: '/upozornenia',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTransakciaIdRoute =
   AuthenticatedTransakciaIdRouteImport.update({
     id: '/transakcia/$id',
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/prijat': typeof AuthenticatedPrijatRoute
   '/rozpocet': typeof AuthenticatedRozpocetRoute
   '/sporenie': typeof AuthenticatedSporenieRoute
+  '/upozornenia': typeof AuthenticatedUpozorneniaRoute
   '/transakcia/$id': typeof AuthenticatedTransakciaIdRoute
 }
 export interface FileRoutesByTo {
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/prijat': typeof AuthenticatedPrijatRoute
   '/rozpocet': typeof AuthenticatedRozpocetRoute
   '/sporenie': typeof AuthenticatedSporenieRoute
+  '/upozornenia': typeof AuthenticatedUpozorneniaRoute
   '/': typeof AuthenticatedIndexRoute
   '/transakcia/$id': typeof AuthenticatedTransakciaIdRoute
 }
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/_authenticated/prijat': typeof AuthenticatedPrijatRoute
   '/_authenticated/rozpocet': typeof AuthenticatedRozpocetRoute
   '/_authenticated/sporenie': typeof AuthenticatedSporenieRoute
+  '/_authenticated/upozornenia': typeof AuthenticatedUpozorneniaRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/transakcia/$id': typeof AuthenticatedTransakciaIdRoute
 }
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/prijat'
     | '/rozpocet'
     | '/sporenie'
+    | '/upozornenia'
     | '/transakcia/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/prijat'
     | '/rozpocet'
     | '/sporenie'
+    | '/upozornenia'
     | '/'
     | '/transakcia/$id'
   id:
@@ -139,6 +151,7 @@ export interface FileRouteTypes {
     | '/_authenticated/prijat'
     | '/_authenticated/rozpocet'
     | '/_authenticated/sporenie'
+    | '/_authenticated/upozornenia'
     | '/_authenticated/'
     | '/_authenticated/transakcia/$id'
   fileRoutesById: FileRoutesById
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSporenieRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/upozornenia': {
+      id: '/_authenticated/upozornenia'
+      path: '/upozornenia'
+      fullPath: '/upozornenia'
+      preLoaderRoute: typeof AuthenticatedUpozorneniaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/transakcia/$id': {
       id: '/_authenticated/transakcia/$id'
       path: '/transakcia/$id'
@@ -230,6 +250,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPrijatRoute: typeof AuthenticatedPrijatRoute
   AuthenticatedRozpocetRoute: typeof AuthenticatedRozpocetRoute
   AuthenticatedSporenieRoute: typeof AuthenticatedSporenieRoute
+  AuthenticatedUpozorneniaRoute: typeof AuthenticatedUpozorneniaRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedTransakciaIdRoute: typeof AuthenticatedTransakciaIdRoute
 }
@@ -241,6 +262,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPrijatRoute: AuthenticatedPrijatRoute,
   AuthenticatedRozpocetRoute: AuthenticatedRozpocetRoute,
   AuthenticatedSporenieRoute: AuthenticatedSporenieRoute,
+  AuthenticatedUpozorneniaRoute: AuthenticatedUpozorneniaRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedTransakciaIdRoute: AuthenticatedTransakciaIdRoute,
 }
