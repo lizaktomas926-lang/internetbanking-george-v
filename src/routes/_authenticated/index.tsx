@@ -4,7 +4,7 @@ import { AppShell } from "@/components/bank/AppShell";
 import { TxnRow } from "@/components/bank/TxnRow";
 import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-store";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Internetbanking George" },

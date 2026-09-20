@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import { addTransaction, CATEGORIES, useBank } from "@/lib/bank-store";
 
-export const Route = createFileRoute("/prijat")({
+export const Route = createFileRoute("/_authenticated/prijat")({
   head: () => ({
     meta: [
       { title: "Prijatý prevod | George" },

@@ -5,12 +5,12 @@ export type Txn = {
   id: string;
   type: "in" | "out";
   counterparty: string;
-  iban?: string;
+  iban?: string | undefined;
   amount: number;
   date: string; // ISO
   category: string;
-  note?: string;
-  vs?: string;
+  note?: string | undefined;
+  vs?: string | undefined;
 };
 
 export type Goal = {

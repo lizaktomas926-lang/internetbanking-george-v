@@ -6,7 +6,7 @@ import { AppShell } from "@/components/bank/AppShell";
 import { formatDate, formatEur, useBank } from "@/lib/bank-store";
 import { exportReceipt } from "@/lib/pdf-export";
 
-export const Route = createFileRoute("/transakcia/$id")({
+export const Route = createFileRoute("/_authenticated/transakcia/$id")({
   head: () => ({
     meta: [
       { title: "Detail transakcie | George" },

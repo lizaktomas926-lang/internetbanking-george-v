@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/bank/AppShell";
 import { addGoal, depositToGoal, formatEur, useBank } from "@/lib/bank-store";
 
-export const Route = createFileRoute("/sporenie")({
+export const Route = createFileRoute("/_authenticated/sporenie")({
   head: () => ({
     meta: [
       { title: "Sporenie a ciele | George" },

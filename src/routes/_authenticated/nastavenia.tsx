@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
-export const Route = createFileRoute('/nastavenia')({
+export const Route = createFileRoute('/_authenticated/nastavenia')({
   component: Nastavenia,
 });
 
