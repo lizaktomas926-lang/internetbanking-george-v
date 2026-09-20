@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Bell, BellRing, PieChart, Volume2 } from "lucide-react";
-import { formatEur } from "@/lib/bank-store";
 import {
   clearNotifications,
   markAllRead,
@@ -163,7 +162,7 @@ function Upozornenia() {
       </section>
 
       <p className="mt-4 text-center text-[11px] text-muted-foreground">
-        Hlásenia sa ukladajú v cloude, limit rozpočtu sledujeme v mene účtu ({formatEur(0).replace(/[\d\s,.]/g, "")}).
+        Hlásenia a nastavenia sa ukladajú v cloude, takže zostanú aj po zatvorení aplikácie.
       </p>
     </div>
   );
