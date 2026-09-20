@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Txn = {
   id: string;
@@ -27,6 +28,7 @@ export type BankState = {
   transactions: Txn[];
   goals: Goal[];
   budgets: BudgetLimit[];
+  loading: boolean;
 };
 
 export const CATEGORIES = [
@@ -42,78 +44,161 @@ export const CATEGORIES = [
   "Prevod",
 ];
 
-const KEY = "sk-banka-v2";
-
 function iso(y: number, m: number, d: number) {
   return new Date(Date.UTC(y, m - 1, d, 10, 0, 0)).toISOString();
 }
 
-function seed(): BankState {
+function randomIban() {
+  let digits = "";
+  for (let i = 0; i < 16; i++) digits += Math.floor(Math.random() * 10);
+  const groups = digits.match(/.{1,4}/g) ?? [];
+  return `SK31 1200 ${groups.slice(0, 3).join(" ")}`;
+}
+
+function seedTransactions() {
   const now = new Date();
   const y = now.getUTCFullYear();
   const m = now.getUTCMonth() + 1;
   const pm = m === 1 ? 12 : m - 1;
   const py = m === 1 ? y - 1 : y;
-  return {
-    owner: "Jakub Varga",
-    iban: "SK31 1200 0000 1987 4263 7541",
-    transactions: [
-      { id: "t0", type: "in", counterparty: "Počiatočný zostatok", amount: 41098.5, date: iso(py, pm, 1), category: "Ostatné príjmy" },
-      { id: "t1", type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(y, m, 5), category: "Mzda", vs: "0100" },
-      { id: "t2", type: "out", counterparty: "Billa", amount: 68.4, date: iso(y, m, 7), category: "Potraviny" },
-      { id: "t3", type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(y, m, 8), category: "Bývanie" },
-      { id: "t4", type: "in", counterparty: "Radina Olha", iban: "SK42 1100 0000 0029 3633 0786", amount: 120, date: iso(y, m, 11), category: "Ostatné príjmy", note: "Vrátenie pôžičky" },
-      { id: "t5", type: "out", counterparty: "Poplatok za vedenie účtu", amount: 7, date: iso(y, m, 12), category: "Poplatky", vs: "0898" },
-      { id: "t6", type: "out", counterparty: "Slovnaft", amount: 52.1, date: iso(y, m, 14), category: "Doprava" },
-      { id: "t7", type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(py, pm, 5), category: "Mzda" },
-      { id: "t8", type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(py, pm, 8), category: "Bývanie" },
-      { id: "t9", type: "out", counterparty: "Kino Lumière", amount: 18, date: iso(py, pm, 19), category: "Zábava" },
-    ],
-    goals: [
-      { id: "g1", name: "Rezervný fond", target: 4000, saved: 2560 },
-      { id: "g2", name: "Dovolenka", target: 1200, saved: 340 },
-    ],
-    budgets: [
-      { category: "Potraviny", limit: 400 },
-      { category: "Bývanie", limit: 600 },
-      { category: "Doprava", limit: 150 },
-      { category: "Zábava", limit: 120 },
-    ],
-  };
+  const rows: Omit<Txn, "id">[] = [
+    { type: "in", counterparty: "Počiatočný zostatok", amount: 41098.5, date: iso(py, pm, 1), category: "Ostatné príjmy" },
+    { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(y, m, 5), category: "Mzda", vs: "0100" },
+    { type: "out", counterparty: "Billa", amount: 68.4, date: iso(y, m, 7), category: "Potraviny" },
+    { type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(y, m, 8), category: "Bývanie" },
+    { type: "in", counterparty: "Radina Olha", iban: "SK42 1100 0000 0029 3633 0786", amount: 120, date: iso(y, m, 11), category: "Ostatné príjmy", note: "Vrátenie pôžičky" },
+    { type: "out", counterparty: "Poplatok za vedenie účtu", amount: 7, date: iso(y, m, 12), category: "Poplatky", vs: "0898" },
+    { type: "out", counterparty: "Slovnaft", amount: 52.1, date: iso(y, m, 14), category: "Doprava" },
+    { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(py, pm, 5), category: "Mzda" },
+    { type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(py, pm, 8), category: "Bývanie" },
+    { type: "out", counterparty: "Kino Lumière", amount: 18, date: iso(py, pm, 19), category: "Zábava" },
+  ];
+  return rows;
 }
 
-let state: BankState = seed();
-let hydrated = false;
+const empty: BankState = {
+  owner: "",
+  iban: "",
+  transactions: [],
+  goals: [],
+  budgets: [],
+  loading: true,
+};
+
+let state: BankState = empty;
 const listeners = new Set<() => void>();
+let loadPromise: Promise<void> | null = null;
 
 function emit() {
+  state = { ...state };
   listeners.forEach((l) => l());
 }
 
-function persist() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  } catch {
-    /* ignore */
+function num(v: unknown) {
+  return typeof v === "number" ? v : Number(v ?? 0);
+}
+
+async function currentUserId() {
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id ?? null;
+}
+
+async function seedIfNeeded(userId: string) {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("owner, iban, seeded")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (profile?.seeded) return profile;
+
+  const iban = profile?.iban && profile.iban.length > 0 ? profile.iban : randomIban();
+
+  await supabase.from("transactions").insert(
+    seedTransactions().map((t) => ({
+      user_id: userId,
+      type: t.type,
+      counterparty: t.counterparty,
+      iban: t.iban ?? null,
+      amount: t.amount,
+      date: t.date,
+      category: t.category,
+      note: t.note ?? null,
+      vs: t.vs ?? null,
+    })),
+  );
+  await supabase.from("goals").insert([
+    { user_id: userId, name: "Rezervný fond", target: 4000, saved: 2560 },
+    { user_id: userId, name: "Dovolenka", target: 1200, saved: 340 },
+  ]);
+  await supabase.from("budgets").insert([
+    { user_id: userId, category: "Potraviny", limit_amount: 400 },
+    { user_id: userId, category: "Bývanie", limit_amount: 600 },
+    { user_id: userId, category: "Doprava", limit_amount: 150 },
+    { user_id: userId, category: "Zábava", limit_amount: 120 },
+  ]);
+
+  const { data: updated } = await supabase
+    .from("profiles")
+    .upsert({ id: userId, owner: profile?.owner ?? "", iban, seeded: true })
+    .select("owner, iban, seeded")
+    .maybeSingle();
+
+  return updated ?? { owner: profile?.owner ?? "", iban, seeded: true };
+}
+
+export async function loadAll() {
+  const userId = await currentUserId();
+  if (!userId) {
+    state = { ...empty, loading: false };
+    emit();
+    return;
   }
+
+  const profile = await seedIfNeeded(userId);
+
+  const [txns, goals, budgets] = await Promise.all([
+    supabase.from("transactions").select("*").order("date", { ascending: false }),
+    supabase.from("goals").select("*").order("created_at", { ascending: true }),
+    supabase.from("budgets").select("*").order("created_at", { ascending: true }),
+  ]);
+
+  state = {
+    owner: profile?.owner ?? "",
+    iban: profile?.iban ?? "",
+    transactions: (txns.data ?? []).map((r) => ({
+      id: r.id,
+      type: r.type === "in" ? "in" : "out",
+      counterparty: r.counterparty,
+      iban: r.iban ?? undefined,
+      amount: num(r.amount),
+      date: r.date,
+      category: r.category,
+      note: r.note ?? undefined,
+      vs: r.vs ?? undefined,
+    })),
+    goals: (goals.data ?? []).map((g) => ({ id: g.id, name: g.name, target: num(g.target), saved: num(g.saved) })),
+    budgets: (budgets.data ?? []).map((b) => ({ category: b.category, limit: num(b.limit_amount) })),
+    loading: false,
+  };
+  emit();
 }
 
 export function hydrate() {
-  if (hydrated) return;
-  hydrated = true;
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) state = { ...seed(), ...(JSON.parse(raw) as BankState) };
-  } catch {
-    /* ignore */
-  }
+  if (!loadPromise) loadPromise = loadAll();
+  return loadPromise;
+}
+
+export function resetStore() {
+  loadPromise = null;
+  state = empty;
   emit();
 }
 
 export function useBank() {
   const [snap, setSnap] = useState<BankState>(state);
   useEffect(() => {
-    const l = () => setSnap({ ...state });
+    const l = () => setSnap(state);
     listeners.add(l);
     hydrate();
     l();
@@ -124,53 +209,82 @@ export function useBank() {
   return snap;
 }
 
-export function addTransaction(t: Omit<Txn, "id">) {
-  state = { ...state, transactions: [{ ...t, id: crypto.randomUUID() }, ...state.transactions] };
-  persist();
+export async function addTransaction(t: Omit<Txn, "id">) {
+  const userId = await currentUserId();
+  if (!userId) return;
+  const { data } = await supabase
+    .from("transactions")
+    .insert({
+      user_id: userId,
+      type: t.type,
+      counterparty: t.counterparty,
+      iban: t.iban ?? null,
+      amount: t.amount,
+      date: t.date,
+      category: t.category,
+      note: t.note ?? null,
+      vs: t.vs ?? null,
+    })
+    .select("id")
+    .maybeSingle();
+
+  state.transactions = [{ ...t, id: data?.id ?? crypto.randomUUID() }, ...state.transactions];
   emit();
 }
 
-export function addGoal(name: string, target: number) {
-  state = { ...state, goals: [...state.goals, { id: crypto.randomUUID(), name, target, saved: 0 }] };
-  persist();
+export async function addGoal(name: string, target: number) {
+  const userId = await currentUserId();
+  if (!userId) return;
+  const { data } = await supabase
+    .from("goals")
+    .insert({ user_id: userId, name, target, saved: 0 })
+    .select("id")
+    .maybeSingle();
+  state.goals = [...state.goals, { id: data?.id ?? crypto.randomUUID(), name, target, saved: 0 }];
   emit();
 }
 
-export function depositToGoal(id: string, amount: number) {
-  state = {
-    ...state,
-    goals: state.goals.map((g) => (g.id === id ? { ...g, saved: g.saved + amount } : g)),
-    transactions: [
-      {
-        id: crypto.randomUUID(),
-        type: "out",
-        counterparty: `Sporenie · ${state.goals.find((g) => g.id === id)?.name ?? ""}`,
-        amount,
-        date: new Date().toISOString(),
-        category: "Sporenie",
-      },
-      ...state.transactions,
-    ],
-  };
-  persist();
+export async function depositToGoal(id: string, amount: number) {
+  const goal = state.goals.find((g) => g.id === id);
+  if (!goal) return;
+  const saved = goal.saved + amount;
+  await supabase.from("goals").update({ saved }).eq("id", id);
+  state.goals = state.goals.map((g) => (g.id === id ? { ...g, saved } : g));
   emit();
+  await addTransaction({
+    type: "out",
+    counterparty: `Sporenie · ${goal.name}`,
+    amount,
+    date: new Date().toISOString(),
+    category: "Sporenie",
+  });
 }
 
-export function setBudget(category: string, limit: number) {
+export async function setBudget(category: string, limit: number) {
+  const userId = await currentUserId();
+  if (!userId) return;
+  await supabase
+    .from("budgets")
+    .upsert({ user_id: userId, category, limit_amount: limit }, { onConflict: "user_id,category" });
   const exists = state.budgets.some((b) => b.category === category);
-  state = {
-    ...state,
-    budgets: exists
-      ? state.budgets.map((b) => (b.category === category ? { ...b, limit } : b))
-      : [...state.budgets, { category, limit }],
-  };
-  persist();
+  state.budgets = exists
+    ? state.budgets.map((b) => (b.category === category ? { category, limit } : b))
+    : [...state.budgets, { category, limit }];
   emit();
 }
 
-export function removeBudget(category: string) {
-  state = { ...state, budgets: state.budgets.filter((b) => b.category !== category) };
-  persist();
+export async function removeBudget(category: string) {
+  await supabase.from("budgets").delete().eq("category", category);
+  state.budgets = state.budgets.filter((b) => b.category !== category);
+  emit();
+}
+
+export async function saveProfile(owner: string, iban: string) {
+  const userId = await currentUserId();
+  if (!userId) return;
+  await supabase.from("profiles").upsert({ id: userId, owner, iban, seeded: true });
+  state.owner = owner;
+  state.iban = iban;
   emit();
 }
 
