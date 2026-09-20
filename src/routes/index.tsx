@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus, ArrowDownLeft, PiggyBank, PieChart } from "lucide-react";
+import { Plus, ArrowDownLeft, PiggyBank, PieChart, Bell } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
 import { TxnRow } from "@/components/bank/TxnRow";
 import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-store";
@@ -27,13 +27,19 @@ function Prehlad() {
 
   return (
     <AppShell>
-      <header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
-        <p className="text-[13px] font-semibold tracking-wide opacity-90">George · Dobrý deň</p>
-        <h1 className="mt-1 text-[34px] font-bold leading-none">Prehľad</h1>
-        <p className="mt-2 text-sm opacity-80">{s.owner}</p>
-      </header>
-
-      <div className="-mt-12 space-y-4 px-4">
+      <Header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-[13px] font-semibold tracking-wide opacity-90">George. Dobrý deň</p>
+      <h1 className="mt-1 text-[34px] font-bold leading-none">Prehľad</h1>
+      <span className="mt-2 text-sm opacity-80">{s.owner}</span>
+    </div>
+    <Link to="/nastavenia">
+      <Bell className="size-6 cursor-pointer" />
+    </Link>
+  </div>
+</Header>
+ <div className="-mt-12 space-y-4 px-4">
         <section className="rounded-3xl bg-surface p-5">
           <p className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">Zostatok na účte</p>
           <p className={`mt-2 text-[36px] font-bold leading-none ${total < 0 ? "text-expense" : ""}`}>
