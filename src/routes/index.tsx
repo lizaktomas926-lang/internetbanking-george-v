@@ -27,7 +27,7 @@ function Prehlad() {
 
   return (
     <AppShell>
-      <Header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
+      <header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
   <div className="flex items-center justify-between">
     <div>
       <p className="text-[13px] font-semibold tracking-wide opacity-90">George. Dobrý deň</p>
@@ -38,7 +38,7 @@ function Prehlad() {
       <Bell className="size-6 cursor-pointer" />
     </Link>
   </div>
-</Header>
+</header>
  <div className="-mt-12 space-y-4 px-4">
         <section className="rounded-3xl bg-surface p-5">
           <p className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">Zostatok na účte</p>
