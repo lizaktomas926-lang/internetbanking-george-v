@@ -230,6 +230,40 @@ export async function addTransaction(t: Omit<Txn, "id">) {
 
   state.transactions = [{ ...t, id: data?.id ?? crypto.randomUUID() }, ...state.transactions];
   emit();
+
+  void announceTransaction({ ...t, id: data?.id ?? "" });
+}
+
+async function announceTransaction(t: Txn) {
+  const { notify } = await import("@/lib/notifications");
+
+  if (t.type === "in") {
+    await notify(
+      "in",
+      "Prijatý prevod",
+      `${formatEur(t.amount)} od ${t.counterparty}. Nový zostatok ${formatEur(balance(state))}.`,
+    );
+  } else {
+    await notify(
+      "out",
+      "Platba odoslaná",
+      `${formatEur(t.amount)} pre ${t.counterparty}. Nový zostatok ${formatEur(balance(state))}.`,
+    );
+
+    const budget = state.budgets.find((b) => b.category === t.category);
+    if (budget && budget.limit > 0) {
+      const spent = state.transactions
+        .filter((x) => x.type === "out" && x.category === t.category && inMonth(x))
+        .reduce((a, x) => a + x.amount, 0);
+      if (spent > budget.limit) {
+        await notify(
+          "budget",
+          `Prekročený rozpočet · ${t.category}`,
+          `Tento mesiac ste utratili ${formatEur(spent)} z limitu ${formatEur(budget.limit)}.`,
+        );
+      }
+    }
+  }
 }
 
 export async function addGoal(name: string, target: number) {

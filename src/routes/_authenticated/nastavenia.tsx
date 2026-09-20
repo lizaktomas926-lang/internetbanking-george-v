@@ -89,27 +89,25 @@ function Nastavenia() {
         </button>
       </section>
 
-      <section className="mt-5 rounded-2xl border border-border bg-surface p-4">
-        <h2 className="text-sm font-semibold text-muted-foreground">Upozornenia</h2>
-        <div className="mt-3 space-y-3 text-sm">
-          <div className="flex items-center justify-between">
-            <span>Prijatý prevod</span>
-            <input type="checkbox" checked={prijatyPrevod} onChange={() => setPrijatyPrevod(!prijatyPrevod)} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Odoslaná platba</span>
-            <input type="checkbox" checked={odoslanaPlatba} onChange={() => setOdoslanaPlatba(!odoslanaPlatba)} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Prekročenie rozpočtu</span>
-            <input
-              type="checkbox"
-              checked={prekrocenieRozpoctu}
-              onChange={() => setPrekrocenieRozpoctu(!prekrocenieRozpoctu)}
-            />
-          </div>
-        </div>
-      </section>
+      <Link
+        to="/upozornenia"
+        className="mt-5 flex items-center justify-between rounded-2xl border border-border bg-surface p-4"
+      >
+        <span>
+          <span className="block text-sm font-semibold">Upozornenia</span>
+          <span className="block text-xs text-muted-foreground">
+            Prijatý prevod, odoslaná platba, prekročenie rozpočtu {unread > 0 ? `· ${unread} nových` : ""}
+          </span>
+        </span>
+        <span className="flex items-center gap-2 text-primary">
+          {unread > 0 ? (
+            <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
+              {unread}
+            </span>
+          ) : null}
+          <Bell className="size-5" />
+        </span>
+      </Link>
 
       <button
         onClick={signOut}
