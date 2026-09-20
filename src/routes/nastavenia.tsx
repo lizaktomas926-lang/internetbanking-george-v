@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 export const Route = createFileRoute('/nastavenia')({
   component: Nastavenia,
@@ -12,7 +13,12 @@ function Nastavenia() {
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Nastavenia upozornení</h1>
+      <div className="flex items-center mb-6">
+        <Link to="/" className="mr-4">
+          <ArrowLeft className="size-6 cursor-pointer" />
+        </Link>
+        <h1 className="text-2xl font-bold">Nastavenia upozornení</h1>
+      </div>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <span>Prijatý prevod</span>
