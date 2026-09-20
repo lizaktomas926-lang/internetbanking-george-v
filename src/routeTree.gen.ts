@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NastaveniaRouteImport } from './routes/nastavenia'
 import { Route as NovaPlatbaRouteImport } from './routes/nova-platba'
 import { Route as PlatbyRouteImport } from './routes/platby'
 import { Route as PrijatRouteImport } from './routes/prijat'
@@ -20,6 +21,11 @@ import { Route as TransakciaIdRouteImport } from './routes/transakcia.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NastaveniaRoute = NastaveniaRouteImport.update({
+  id: '/nastavenia',
+  path: '/nastavenia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NovaPlatbaRoute = NovaPlatbaRouteImport.update({
@@ -55,6 +61,7 @@ const TransakciaIdRoute = TransakciaIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/nastavenia': typeof NastaveniaRoute
   '/nova-platba': typeof NovaPlatbaRoute
   '/platby': typeof PlatbyRoute
   '/prijat': typeof PrijatRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/nastavenia': typeof NastaveniaRoute
   '/nova-platba': typeof NovaPlatbaRoute
   '/platby': typeof PlatbyRoute
   '/prijat': typeof PrijatRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/nastavenia': typeof NastaveniaRoute
   '/nova-platba': typeof NovaPlatbaRoute
   '/platby': typeof PlatbyRoute
   '/prijat': typeof PrijatRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/nastavenia'
     | '/nova-platba'
     | '/platby'
     | '/prijat'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/nastavenia'
     | '/nova-platba'
     | '/platby'
     | '/prijat'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/nastavenia'
     | '/nova-platba'
     | '/platby'
     | '/prijat'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  NastaveniaRoute: typeof NastaveniaRoute
   NovaPlatbaRoute: typeof NovaPlatbaRoute
   PlatbyRoute: typeof PlatbyRoute
   PrijatRoute: typeof PrijatRoute
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nastavenia': {
+      id: '/nastavenia'
+      path: '/nastavenia'
+      fullPath: '/nastavenia'
+      preLoaderRoute: typeof NastaveniaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nova-platba': {
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  NastaveniaRoute: NastaveniaRoute,
   NovaPlatbaRoute: NovaPlatbaRoute,
   PlatbyRoute: PlatbyRoute,
   PrijatRoute: PrijatRoute,
