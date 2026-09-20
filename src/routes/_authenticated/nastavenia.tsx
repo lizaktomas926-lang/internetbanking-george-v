@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { ArrowLeft, Bell, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { resetStore, saveProfile, useBank } from "@/lib/bank-store";
+import { resetNotifications, unreadCount, useNotifications } from "@/lib/notifications";
 
 export const Route = createFileRoute("/_authenticated/nastavenia")({
   head: () => ({
@@ -24,6 +25,8 @@ function Nastavenia() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const s = useBank();
+  const notifs = useNotifications();
+  const unread = unreadCount(notifs);
   const [owner, setOwner] = useState("");
   const [iban, setIban] = useState("");
   const [email, setEmail] = useState("");
@@ -49,6 +52,7 @@ function Nastavenia() {
     await queryClient.cancelQueries();
     queryClient.clear();
     resetStore();
+    resetNotifications();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
