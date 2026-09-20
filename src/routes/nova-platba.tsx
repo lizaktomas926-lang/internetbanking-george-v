@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import { addTransaction, balance, CATEGORIES, formatEur, useBank } from "@/lib/bank-store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/nova-platba")({
   head: () => ({
@@ -46,8 +47,26 @@ function NovaPlatba() {
       category,
       ...(note.trim() ? { note: note.trim() } : {}),
     });
-    navigate({ to: "/platby" });
-  }
+    function submit(e: React.FormEvent) {
+  e.preventDefault();
+  if (!name.trim()) return setError("Zadajte meno príjemcu.");
+  if (!iban.trim()) return setError("Zadajte IBAN príjemcu.");
+  if (!Number.isFinite(value) || value <= 0) return setError("Zadajte platnú sumu.");
+
+  addTransaction({
+    type: "out",
+    counterparty: name.trim(),
+    iban: iban.trim().toUpperCase(),
+    amount: Math.round(value * 100) / 100,
+    date: new Date().toISOString(),
+    category,
+    ...(note.trim() ? { note: note.trim() } : {}),
+  });
+
+  toast.success("Platba bola úspešne odoslaná");
+
+  navigate({ to: "/platby" });
+    }
 
   return (
     <AppShell>
