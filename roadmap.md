@@ -8,3 +8,4 @@
 - [x] Sporenie: ciele a vklady
 - [x] Rozpočet: kategórie, limity, príjmy vs výdavky
 - [x] Uloženie dát v prehliadači
+- [x] Ikona George a pridanie aplikácie na plochu iPhonu
