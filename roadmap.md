@@ -9,3 +9,4 @@
 - [x] Rozpočet: kategórie, limity, príjmy vs výdavky
 - [x] Uloženie dát v prehliadači
 - [x] Ikona George a pridanie aplikácie na plochu iPhonu
+- [x] Prihlásenie (e-mail + Google) a ukladanie údajov do Lovable Cloud
