@@ -138,6 +138,13 @@ function RootComponent() {
   const locationKey = useRouterState({
     select: (state) => state.location.pathname + state.location.searchStr,
   });
+  // Keep the first client render identical to the server render: a changing key
+  // on the hydration root makes React throw away the tree (blank screen).
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -154,8 +161,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <main key={locationKey} className="screen-transition">
-        <Outlet />
+      <main className="screen-transition">
+        <div key={hydrated ? locationKey : "ssr"} className="screen-transition">
+          <Outlet />
+        </div>
       </main>
       <Toaster position="top-center" />
     </QueryClientProvider>
