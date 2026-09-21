@@ -11,3 +11,4 @@
 - [x] Ikona George a pridanie aplikácie na plochu iPhonu
 - [x] Prihlásenie (e-mail + Google) a ukladanie údajov do Lovable Cloud
 - [x] Upozornenia: prijatý prevod, odoslaná platba, prekročenie rozpočtu + zvuk
+- [x] Trvalo viditeľná spodná navigácia + denný a nočný režim
