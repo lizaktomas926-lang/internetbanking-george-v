@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Home, ArrowLeftRight, PiggyBank, PieChart, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,12 +18,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 export function PersistentBottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [light, setLight] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("george-theme");
     const nextLight = saved === "light";
     setLight(nextLight);
     document.documentElement.classList.toggle("light", nextLight);
+    setMounted(true);
   }, []);
 
   function toggleTheme() {
@@ -32,7 +35,9 @@ export function PersistentBottomNav() {
     window.localStorage.setItem("george-theme", nextLight ? "light" : "dark");
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
       <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-border bg-surface/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgb(0_0_0/0.08)] backdrop-blur-xl">
         <div className="grid grid-cols-5 px-1">
           {tabs.map(({ to, label, icon: Icon }) => {
@@ -62,7 +67,8 @@ export function PersistentBottomNav() {
             <span>{light ? "Nočný" : "Denný"}</span>
           </Button>
         </div>
-      </nav>
+      </nav>,
+      document.body,
   );
 }
 
