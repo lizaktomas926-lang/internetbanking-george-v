@@ -1,11 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bell, LogOut } from "lucide-react";
+import { ArrowLeft, Bell, Fingerprint, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { resetStore, saveProfile, useBank } from "@/lib/bank-store";
 import { resetNotifications, unreadCount, useNotifications } from "@/lib/notifications";
+import {
+  clearUnlocked,
+  disableBiometric,
+  enableBiometric,
+  isBiometricEnabled,
+  isBiometricSupported,
+} from "@/lib/biometric";
 
 export const Route = createFileRoute("/_authenticated/nastavenia")({
   head: () => ({
