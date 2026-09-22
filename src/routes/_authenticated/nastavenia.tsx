@@ -46,9 +46,40 @@ function Nastavenia() {
     setIban(s.iban);
   }, [s.owner, s.iban]);
 
+  const [userId, setUserId] = useState<string | null>(null);
+  const [bioSupported, setBioSupported] = useState(false);
+  const [bioOn, setBioOn] = useState(false);
+  const [bioBusy, setBioBusy] = useState(false);
+
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
+    supabase.auth.getUser().then(({ data }) => {
+      setEmail(data.user?.email ?? "");
+      const id = data.user?.id ?? null;
+      setUserId(id);
+      if (id) setBioOn(isBiometricEnabled(id));
+    });
+    isBiometricSupported().then(setBioSupported);
   }, []);
+
+  async function toggleBiometric() {
+    if (!userId) return;
+    setBioBusy(true);
+    try {
+      if (bioOn) {
+        disableBiometric(userId);
+        setBioOn(false);
+        toast.success("Odomykanie biometriou je vypnuté.");
+      } else {
+        await enableBiometric(userId, owner.trim() || email || "George");
+        setBioOn(true);
+        toast.success("Aplikácia sa teraz odomkne odtlačkom prsta alebo tvárou.");
+      }
+    } catch {
+      toast.error("Overenie sa nepodarilo. Skontrolujte zámku obrazovky na zariadení.");
+    } finally {
+      setBioBusy(false);
+    }
+  }
 
   async function save() {
     await saveProfile(owner.trim(), iban.trim());
