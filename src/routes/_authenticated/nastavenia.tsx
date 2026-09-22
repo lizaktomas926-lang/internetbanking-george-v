@@ -91,6 +91,7 @@ function Nastavenia() {
     queryClient.clear();
     resetStore();
     resetNotifications();
+    clearUnlocked();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
@@ -103,6 +104,31 @@ function Nastavenia() {
         </Link>
         <h1 className="text-2xl font-bold">Nastavenia</h1>
       </div>
+
+      <section className="mb-5 rounded-2xl border border-border bg-surface p-4">
+        <div className="flex items-start gap-3">
+          <Fingerprint className="mt-0.5 size-5 text-primary" />
+          <div className="flex-1">
+            <h2 className="text-sm font-semibold">Odomykanie odtlačkom alebo tvárou</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {bioSupported
+                ? "Aplikácia si pri otvorení vyžiada odtlačok prsta, tvár alebo zámku obrazovky."
+                : "Toto zariadenie alebo prehliadač nepodporuje odomykanie zámkou obrazovky."}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={toggleBiometric}
+          disabled={!bioSupported || bioBusy || !userId}
+          className={`mt-4 w-full rounded-xl px-4 py-3 font-semibold disabled:opacity-60 ${
+            bioOn
+              ? "border border-border bg-background text-foreground"
+              : "bg-primary text-primary-foreground"
+          }`}
+        >
+          {bioBusy ? "Overujem…" : bioOn ? "Vypnúť odomykanie biometriou" : "Zapnúť odomykanie biometriou"}
+        </button>
+      </section>
 
       <section className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="text-sm font-semibold text-muted-foreground">Môj účet</h2>
