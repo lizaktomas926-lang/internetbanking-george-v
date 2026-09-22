@@ -12,13 +12,18 @@ export function BiometricLock({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (!active) return;
-      const id = data.user?.id ?? null;
-      setUserId(id);
-      setLocked(!!id && isBiometricEnabled(id) && !isUnlocked(id));
-      setChecked(true);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (!active) return;
+        const id = data.user?.id ?? null;
+        setUserId(id);
+        setLocked(!!id && isBiometricEnabled(id) && !isUnlocked(id));
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setChecked(true);
+      });
     return () => {
       active = false;
     };
