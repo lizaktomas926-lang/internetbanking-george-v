@@ -1,11 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bell, LogOut } from "lucide-react";
+import { ArrowLeft, Bell, Fingerprint, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { resetStore, saveProfile, useBank } from "@/lib/bank-store";
 import { resetNotifications, unreadCount, useNotifications } from "@/lib/notifications";
+import {
+  clearUnlocked,
+  disableBiometric,
+  enableBiometric,
+  isBiometricEnabled,
+  isBiometricSupported,
+} from "@/lib/biometric";
 
 export const Route = createFileRoute("/_authenticated/nastavenia")({
   head: () => ({
@@ -39,9 +46,40 @@ function Nastavenia() {
     setIban(s.iban);
   }, [s.owner, s.iban]);
 
+  const [userId, setUserId] = useState<string | null>(null);
+  const [bioSupported, setBioSupported] = useState(false);
+  const [bioOn, setBioOn] = useState(false);
+  const [bioBusy, setBioBusy] = useState(false);
+
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
+    supabase.auth.getUser().then(({ data }) => {
+      setEmail(data.user?.email ?? "");
+      const id = data.user?.id ?? null;
+      setUserId(id);
+      if (id) setBioOn(isBiometricEnabled(id));
+    });
+    isBiometricSupported().then(setBioSupported);
   }, []);
+
+  async function toggleBiometric() {
+    if (!userId) return;
+    setBioBusy(true);
+    try {
+      if (bioOn) {
+        disableBiometric(userId);
+        setBioOn(false);
+        toast.success("Odomykanie biometriou je vypnuté.");
+      } else {
+        await enableBiometric(userId, owner.trim() || email || "George");
+        setBioOn(true);
+        toast.success("Aplikácia sa teraz odomkne odtlačkom prsta alebo tvárou.");
+      }
+    } catch {
+      toast.error("Overenie sa nepodarilo. Skontrolujte zámku obrazovky na zariadení.");
+    } finally {
+      setBioBusy(false);
+    }
+  }
 
   async function save() {
     await saveProfile(owner.trim(), iban.trim());
@@ -53,6 +91,7 @@ function Nastavenia() {
     queryClient.clear();
     resetStore();
     resetNotifications();
+    clearUnlocked();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
@@ -65,6 +104,31 @@ function Nastavenia() {
         </Link>
         <h1 className="text-2xl font-bold">Nastavenia</h1>
       </div>
+
+      <section className="mb-5 rounded-2xl border border-border bg-surface p-4">
+        <div className="flex items-start gap-3">
+          <Fingerprint className="mt-0.5 size-5 text-primary" />
+          <div className="flex-1">
+            <h2 className="text-sm font-semibold">Odomykanie odtlačkom alebo tvárou</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {bioSupported
+                ? "Aplikácia si pri otvorení vyžiada odtlačok prsta, tvár alebo zámku obrazovky."
+                : "Toto zariadenie alebo prehliadač nepodporuje odomykanie zámkou obrazovky."}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={toggleBiometric}
+          disabled={!bioSupported || bioBusy || !userId}
+          className={`mt-4 w-full rounded-xl px-4 py-3 font-semibold disabled:opacity-60 ${
+            bioOn
+              ? "border border-border bg-background text-foreground"
+              : "bg-primary text-primary-foreground"
+          }`}
+        >
+          {bioBusy ? "Overujem…" : bioOn ? "Vypnúť odomykanie biometriou" : "Zapnúť odomykanie biometriou"}
+        </button>
+      </section>
 
       <section className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="text-sm font-semibold text-muted-foreground">Môj účet</h2>
