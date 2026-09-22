@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { PersistentBottomNav } from "@/components/bank/AppShell";
+import { BiometricLock } from "@/components/bank/BiometricLock";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -14,9 +15,11 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background pb-28">
-      <Outlet />
-      <PersistentBottomNav />
-    </div>
+    <BiometricLock>
+      <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background pb-28">
+        <Outlet />
+        <PersistentBottomNav />
+      </div>
+    </BiometricLock>
   );
 }
