@@ -12,3 +12,5 @@
 - [x] Prihlásenie (e-mail + Google) a ukladanie údajov do Lovable Cloud
 - [x] Upozornenia: prijatý prevod, odoslaná platba, prekročenie rozpočtu + zvuk
 - [x] Trvalo viditeľná spodná navigácia + denný a nočný režim
+
+- [x] Odomykanie aplikácie odtlačkom prsta / tvárou (zámka obrazovky)
