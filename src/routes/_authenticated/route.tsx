@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, isRedirect, Link, Outlet, redirect } from "@tanstack/react-router";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PersistentBottomNav } from "@/components/bank/AppShell";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
       if (error || !data.user) throw redirect({ to: "/auth" });
       return { user: data.user };
     } catch (error) {
-      if (error instanceof Response) throw error;
+      if (isRedirect(error)) throw error;
       throw new Error("Prihlásenie sa nepodarilo overiť.", { cause: error });
     }
   },
@@ -56,13 +56,13 @@ class AuthenticatedErrorBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }
 > {
-  state = { failed: false };
+  override state = { failed: false };
 
   static getDerivedStateFromError() {
     return { failed: true };
   }
 
-  componentDidCatch(error: unknown, info: ErrorInfo) {
+  override componentDidCatch(error: unknown, info: ErrorInfo) {
     console.error(error);
     reportLovableError(error, {
       boundary: "authenticated_layout",
@@ -70,7 +70,7 @@ class AuthenticatedErrorBoundary extends Component<
     });
   }
 
-  render() {
+  override render() {
     if (this.state.failed) return <AuthErrorComponent error={new Error("Authenticated page failed")} />;
     return this.props.children;
   }
