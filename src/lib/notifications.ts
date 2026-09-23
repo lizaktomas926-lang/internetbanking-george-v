@@ -107,7 +107,13 @@ export async function loadNotifications() {
 }
 
 export function hydrateNotifications() {
-  if (!loadPromise) loadPromise = loadNotifications();
+  if (!loadPromise) {
+    loadPromise = loadNotifications().catch((error: unknown) => {
+      console.error(error);
+      state = { settings: defaults, items: [], loading: false };
+      emit();
+    });
+  }
   return loadPromise;
 }
 
@@ -122,7 +128,7 @@ export function useNotifications() {
   useEffect(() => {
     const l = () => setSnap(state);
     listeners.add(l);
-    hydrateNotifications();
+    void hydrateNotifications();
     l();
     return () => {
       listeners.delete(l);
