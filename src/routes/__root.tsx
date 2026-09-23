@@ -4,11 +4,10 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,17 +134,6 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
-  const locationKey = useRouterState({
-    select: (state) => state.location.pathname + state.location.searchStr,
-  });
-  // Keep the first client render identical to the server render: a changing key
-  // on the hydration root makes React throw away the tree (blank screen).
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
@@ -162,9 +150,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <main className="screen-transition">
-        <div key={hydrated ? locationKey : "ssr"} className="screen-transition">
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
       <Toaster position="top-center" />
     </QueryClientProvider>

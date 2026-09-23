@@ -29,6 +29,7 @@ export type BankState = {
   goals: Goal[];
   budgets: BudgetLimit[];
   loading: boolean;
+  error: string | null;
 };
 
 export const CATEGORIES = [
@@ -83,6 +84,7 @@ const empty: BankState = {
   goals: [],
   budgets: [],
   loading: true,
+  error: null,
 };
 
 let state: BankState = empty;
@@ -150,7 +152,7 @@ async function seedIfNeeded(userId: string) {
 export async function loadAll() {
   const userId = await currentUserId();
   if (!userId) {
-    state = { ...empty, loading: false };
+    state = { ...empty, loading: false, error: null };
     emit();
     return;
   }
@@ -180,12 +182,23 @@ export async function loadAll() {
     goals: (goals.data ?? []).map((g) => ({ id: g.id, name: g.name, target: num(g.target), saved: num(g.saved) })),
     budgets: (budgets.data ?? []).map((b) => ({ category: b.category, limit: num(b.limit_amount) })),
     loading: false,
+    error: null,
   };
   emit();
 }
 
 export function hydrate() {
-  if (!loadPromise) loadPromise = loadAll();
+  if (!loadPromise) {
+    loadPromise = loadAll().catch((error: unknown) => {
+      console.error(error);
+      state = {
+        ...empty,
+        loading: false,
+        error: "Údaje účtu sa nepodarilo načítať. Skontrolujte pripojenie a skúste to znova.",
+      };
+      emit();
+    });
+  }
   return loadPromise;
 }
 
@@ -200,7 +213,7 @@ export function useBank() {
   useEffect(() => {
     const l = () => setSnap(state);
     listeners.add(l);
-    hydrate();
+    void hydrate();
     l();
     return () => {
       listeners.delete(l);

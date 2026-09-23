@@ -1,36 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import { Fingerprint, ScanFace } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { isBiometricEnabled, isUnlocked, verifyBiometric } from "@/lib/biometric";
+import { Button } from "@/components/ui/button";
 
-export function BiometricLock({ children }: { children: React.ReactNode }) {
+export function BiometricLock({ children, userId }: { children: React.ReactNode; userId: string }) {
   const [locked, setLocked] = useState(false);
   const [checked, setChecked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
-    supabase.auth
-      .getUser()
-      .then(({ data }) => {
-        if (!active) return;
-        const id = data.user?.id ?? null;
-        setUserId(id);
-        setLocked(!!id && isBiometricEnabled(id) && !isUnlocked(id));
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (active) setChecked(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+    try {
+      setLocked(isBiometricEnabled(userId) && !isUnlocked(userId));
+    } catch {
+      setLocked(false);
+      setError("Biometrický zámok sa nepodarilo načítať.");
+    } finally {
+      setChecked(true);
+    }
+  }, [userId]);
 
   const unlock = useCallback(async () => {
-    if (!userId) return;
     setBusy(true);
     setError(null);
     try {
@@ -49,7 +39,13 @@ export function BiometricLock({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, locked]);
 
-  if (!checked) return null;
+  if (!checked) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+        <p className="text-sm text-muted-foreground">Načítavam zabezpečenie aplikácie…</p>
+      </div>
+    );
+  }
 
   if (locked) {
     return (
@@ -64,13 +60,13 @@ export function BiometricLock({ children }: { children: React.ReactNode }) {
           </p>
           {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
         </div>
-        <button
+        <Button
           onClick={unlock}
           disabled={busy}
-          className="flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground disabled:opacity-60"
+          className="h-12 w-full max-w-xs rounded-xl font-semibold"
         >
           <ScanFace className="size-5" /> {busy ? "Overujem…" : "Odomknúť"}
-        </button>
+        </Button>
       </div>
     );
   }

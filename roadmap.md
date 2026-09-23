@@ -14,3 +14,4 @@
 - [x] Trvalo viditeľná spodná navigácia + denný a nočný režim
 
 - [x] Odomykanie aplikácie odtlačkom prsta / tvárou (zámka obrazovky)
+- [x] Ochrana prihlásených obrazoviek pred prázdnym zobrazením pri chybe načítania
