@@ -52,13 +52,20 @@ function Nastavenia() {
   const [bioBusy, setBioBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    let active = true;
+    void supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
       setEmail(data.user?.email ?? "");
       const id = data.user?.id ?? null;
       setUserId(id);
       if (id) setBioOn(isBiometricEnabled(id));
     });
-    isBiometricSupported().then(setBioSupported);
+    void isBiometricSupported().then((supported) => {
+      if (active) setBioSupported(supported);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function toggleBiometric() {

@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_authenticated")({
     }
   },
   component: AuthenticatedLayout,
+  pendingComponent: AuthLoadingComponent,
   errorComponent: AuthErrorComponent,
   notFoundComponent: () => (
     <div className="flex min-h-screen items-center justify-center bg-background p-6 text-center">
@@ -27,6 +28,14 @@ export const Route = createFileRoute("/_authenticated")({
     </div>
   ),
 });
+
+function AuthLoadingComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+      <p className="text-sm text-muted-foreground">Overujem prihlásenie…</p>
+    </div>
+  );
+}
 
 function AuthErrorComponent({ error }: { error: unknown }) {
   console.error(error);

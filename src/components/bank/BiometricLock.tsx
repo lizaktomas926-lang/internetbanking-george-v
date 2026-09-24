@@ -34,11 +34,6 @@ export function BiometricLock({ children, userId }: { children: React.ReactNode;
     }
   }, [userId]);
 
-  useEffect(() => {
-    if (checked && locked && !busy && !error) void unlock();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked, locked]);
-
   if (!checked) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
