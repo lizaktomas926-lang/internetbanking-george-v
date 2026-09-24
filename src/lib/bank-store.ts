@@ -213,12 +213,12 @@ export function useBank() {
   useEffect(() => {
     const l = () => setSnap(state);
     listeners.add(l);
-    void hydrate();
+    if (snap.loading) void hydrate();
     l();
     return () => {
       listeners.delete(l);
     };
-  }, []);
+  }, [snap.loading]);
   return snap;
 }
 

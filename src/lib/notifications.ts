@@ -128,12 +128,12 @@ export function useNotifications() {
   useEffect(() => {
     const l = () => setSnap(state);
     listeners.add(l);
-    void hydrateNotifications();
+    if (snap.loading) void hydrateNotifications();
     l();
     return () => {
       listeners.delete(l);
     };
-  }, []);
+  }, [snap.loading]);
   return snap;
 }
 
