@@ -19,6 +19,7 @@ export function SwipeNav({ children }: { children: ReactNode }) {
           return;
         }
         const t = e.touches[0];
+        if (!t) return;
         start.current = { x: t.clientX, y: t.clientY, t: Date.now() };
       }}
       onTouchEnd={(e) => {
@@ -26,12 +27,14 @@ export function SwipeNav({ children }: { children: ReactNode }) {
         start.current = null;
         if (!s || index < 0) return;
         const t = e.changedTouches[0];
+        if (!t) return;
         const dx = t.clientX - s.x;
         const dy = t.clientY - s.y;
         if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.5 || Date.now() - s.t > 800) return;
         const next = dx < 0 ? index + 1 : index - 1;
         if (next < 0 || next >= order.length) return;
-        navigate({ to: order[next] });
+        const to = order[next];
+        if (to) navigate({ to });
       }}
     >
       {children}
