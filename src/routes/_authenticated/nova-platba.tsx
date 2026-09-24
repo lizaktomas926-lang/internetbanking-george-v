@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Fingerprint } from "lucide-react";
+import { isBiometricEnabled, verifyBiometric } from "@/lib/biometric";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import {
   addTransaction,
@@ -45,11 +47,16 @@ function NovaPlatba() {
   const [category, setCategory] = useState("Prevod");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { user } = Route.useRouteContext();
+  const [bioOn, setBioOn] = useState(false);
+  useEffect(() => setBioOn(isBiometricEnabled(user.id)), [user.id]);
 
   const value = Number(amount.replace(",", "."));
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setError("");
 
     if (!name.trim()) {
@@ -62,6 +69,19 @@ function NovaPlatba() {
 
     if (!Number.isFinite(value) || value <= 0) {
       return setError("Zadajte platnú sumu.");
+    }
+
+    if (isBiometricEnabled(user.id)) {
+      setBusy(true);
+      try {
+        const ok = await verifyBiometric(user.id);
+        if (!ok) throw new Error("fail");
+      } catch {
+        setBusy(false);
+        toast.error("Platba nebola potvrdená biometriou");
+        return setError("Overenie odtlačkom alebo tvárou zlyhalo. Skúste znova.");
+      }
+      setBusy(false);
     }
 
     addTransaction({
@@ -167,10 +187,17 @@ function NovaPlatba() {
 
         <button
           type="submit"
-          className="h-12 w-full rounded-2xl bg-primary text-[15px] font-semibold text-primary-foreground"
+          disabled={busy}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-semibold text-primary-foreground disabled:opacity-60"
         >
-          Odoslať platbu
+          {bioOn ? <Fingerprint className="h-5 w-5" /> : null}
+          {busy ? "Overujem…" : bioOn ? "Potvrdiť biometriou a odoslať" : "Odoslať platbu"}
         </button>
+        {!bioOn ? (
+          <p className="px-1 text-center text-[12px] text-muted-foreground">
+            Potvrdzovanie platieb odtlačkom alebo tvárou zapnete v Nastaveniach.
+          </p>
+        ) : null}
       </form>
     </AppShell>
   );
