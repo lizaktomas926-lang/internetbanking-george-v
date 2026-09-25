@@ -7,6 +7,7 @@ import {
   addTransaction,
   balance,
   CATEGORIES,
+  formatDate,
   formatEur,
   useBank,
   type Txn,
