@@ -71,18 +71,25 @@ function NovaPlatba() {
       return setError("Zadajte platnú sumu.");
     }
 
-    if (isBiometricEnabled(user.id)) {
-      setBusy(true);
-      try {
-        const ok = await verifyBiometric(user.id);
-        if (!ok) throw new Error("fail");
-      } catch {
-        setBusy(false);
-        toast.error("Platba nebola potvrdená biometriou");
-        return setError("Overenie odtlačkom alebo tvárou zlyhalo. Skúste znova.");
+    setBusy(true);
+    try {
+      if (!(await isBiometricSupported())) {
+        throw new Error("Toto zariadenie alebo okno nepodporuje odtlačok ani tvár. Otvorte aplikáciu priamo v Safari alebo z plochy.");
       }
+      if (!isBiometricEnabled(user.id)) {
+        await enableBiometric(user.id, user.email ?? "George");
+        setBioOn(true);
+      } else {
+        const ok = await verifyBiometric(user.id);
+        if (!ok) throw new Error("Overenie odtlačkom alebo tvárou zlyhalo. Skúste znova.");
+      }
+    } catch (err) {
       setBusy(false);
+      toast.error("Platba nebola potvrdená biometriou");
+      const msg = err instanceof Error && err.name !== "NotAllowedError" ? err.message : "";
+      return setError(msg || "Overenie bolo zrušené alebo zlyhalo. Skúste znova.");
     }
+    setBusy(false);
 
     addTransaction({
       type: "out",
