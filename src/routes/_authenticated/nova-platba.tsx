@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Fingerprint } from "lucide-react";
+import { Check, FileDown, Fingerprint } from "lucide-react";
 import { enableBiometric, isBiometricEnabled, isBiometricSupported, verifyBiometric } from "@/lib/biometric";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import {
@@ -9,7 +9,9 @@ import {
   CATEGORIES,
   formatEur,
   useBank,
+  type Txn,
 } from "@/lib/bank-store";
+import { exportReceipt } from "@/lib/pdf-export";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/nova-platba")({
@@ -48,11 +50,17 @@ function NovaPlatba() {
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState<Txn | null>(null);
+  const [savingPdf, setSavingPdf] = useState(false);
   const { user } = Route.useRouteContext();
   const [bioOn, setBioOn] = useState(false);
   useEffect(() => setBioOn(isBiometricEnabled(user.id)), [user.id]);
 
   const value = Number(amount.replace(",", "."));
+
+  if (sent) {
+    return <PaymentReceipt txn={sent} s={s} savingPdf={savingPdf} setSavingPdf={setSavingPdf} onDone={() => navigate({ to: "/platby" })} />;
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -91,7 +99,7 @@ function NovaPlatba() {
     }
     setBusy(false);
 
-    addTransaction({
+    const txn = await addTransaction({
       type: "out",
       counterparty: name.trim(),
       iban: iban.trim().toUpperCase(),
@@ -103,7 +111,11 @@ function NovaPlatba() {
 
     toast.success("Platba bola úspešne odoslaná");
 
-    navigate({ to: "/platby" });
+    if (txn) {
+      setSent(txn);
+    } else {
+      navigate({ to: "/platby" });
+    }
   }
 
   return (
