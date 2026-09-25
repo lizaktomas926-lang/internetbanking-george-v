@@ -221,3 +221,93 @@ function NovaPlatba() {
     </AppShell>
   );
 }
+
+function PaymentReceipt({
+  txn,
+  s,
+  savingPdf,
+  setSavingPdf,
+  onDone,
+}: {
+  txn: Txn;
+  s: ReturnType<typeof useBank>;
+  savingPdf: boolean;
+  setSavingPdf: (v: boolean) => void;
+  onDone: () => void;
+}) {
+  return (
+    <AppShell>
+      <header className="brand-header px-5 pb-16 pt-6 text-brand-foreground">
+        <h1 className="text-[26px] font-bold leading-tight">Platba odoslaná</h1>
+      </header>
+
+      <div className="-mt-12 space-y-3 px-4">
+        <section className="rounded-3xl bg-surface p-5 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-income/15">
+            <Check className="size-7 text-income" />
+          </div>
+          <p className="mt-3 text-[12px] text-muted-foreground">Odoslaná suma</p>
+          <p className="text-[32px] font-bold leading-tight">
+            −{formatEur(txn.amount).replace("-", "")}
+          </p>
+          <span className="mt-3 inline-block rounded-full border border-border px-3 py-1 text-[12px] text-muted-foreground">
+            Stav: Odoslaná
+          </span>
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            Čaká na zaúčtovanie – zvyčajne do 1 pracovného dňa.
+          </p>
+        </section>
+
+        <section className="rounded-2xl bg-surface">
+          <Row label="Príjemca" value={txn.counterparty} />
+          {txn.iban ? <Row label="IBAN príjemcu" value={txn.iban} /> : null}
+          <Row label="Kategória" value={txn.category} />
+          <Row label="Dátum odoslania" value={formatDate(txn.date)} />
+          {txn.note ? <Row label="Správa pre príjemcu" value={txn.note} /> : null}
+          <Row label="Nový zostatok na účte" value={formatEur(balance(s))} />
+        </section>
+
+        <button
+          onClick={async () => {
+            setSavingPdf(true);
+            try {
+              await exportReceipt(s, txn);
+              toast.success("Potvrdenie o platbe bolo stiahnuté");
+            } catch (e) {
+              console.error(e);
+              toast.error("Potvrdenie sa nepodarilo vytvoriť. Skúste to prosím znova.");
+            } finally {
+              setSavingPdf(false);
+            }
+          }}
+          disabled={savingPdf}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-[14px] font-semibold text-primary-foreground disabled:opacity-60"
+        >
+          <FileDown className="size-4" /> {savingPdf ? "Pripravujem…" : "Stiahnuť potvrdenie (PDF)"}
+        </button>
+
+        <button
+          onClick={onDone}
+          className="flex w-full items-center justify-center rounded-full border border-border py-3 text-[14px] font-semibold"
+        >
+          Hotovo
+        </button>
+
+        <p className="pb-2 text-center text-[13px]">
+          <Link to="/transakcia/$id" params={{ id: txn.id }} className="font-semibold text-primary">
+            Zobraziť detail platby
+          </Link>
+        </p>
+      </div>
+    </AppShell>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-b border-border px-4 py-3 last:border-0">
+      <p className="text-[12px] text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-[15px]">{value}</p>
+    </div>
+  );
+}
