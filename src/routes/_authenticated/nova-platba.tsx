@@ -11,6 +11,30 @@ import {
   useBank,
 } from "@/lib/bank-store";
 import { toast } from "sonner";
+{/* Tlačidlo na spustenie skenera */}
+<div className="mb-3 px-4">
+  <button
+    type="button"
+    onClick={() => setScannerOpen(true)}
+    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 py-3 text-sm font-bold text-primary hover:bg-primary/15"
+  >
+    <QrCode className="size-4" />
+    Skenovať QR kód / Faktúru
+  </button>
+</div>
+
+{/* Modálne okno skenera */}
+<QrScannerModal
+  open={scannerOpen}
+  onClose={() => setScannerOpen(false)}
+  onScanSuccess={(data) => {
+    if (data.recipientName) setName(data.recipientName);
+    if (data.iban) setIban(data.iban);
+    if (data.amount) setAmount(data.amount);
+    if (data.vs) setVs(data.vs);
+    if (data.note) setNote(data.note);
+  }}
+/>
 
 export const Route = createFileRoute("/_authenticated/nova-platba")({
   head: () => ({
