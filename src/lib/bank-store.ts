@@ -222,9 +222,9 @@ export function useBank() {
   return snap;
 }
 
-export async function addTransaction(t: Omit<Txn, "id">): Promise<Txn | undefined> {
+export async function addTransaction(t: Omit<Txn, "id">) {
   const userId = await currentUserId();
-  if (!userId) return undefined;
+  if (!userId) return;
   const { data } = await supabase
     .from("transactions")
     .insert({
@@ -241,12 +241,10 @@ export async function addTransaction(t: Omit<Txn, "id">): Promise<Txn | undefine
     .select("id")
     .maybeSingle();
 
-  const txn: Txn = { ...t, id: data?.id ?? crypto.randomUUID() };
-  state.transactions = [txn, ...state.transactions];
+  state.transactions = [{ ...t, id: data?.id ?? crypto.randomUUID() }, ...state.transactions];
   emit();
 
-  void announceTransaction(txn);
-  return txn;
+  void announceTransaction({ ...t, id: data?.id ?? "" });
 }
 
 async function announceTransaction(t: Txn) {
