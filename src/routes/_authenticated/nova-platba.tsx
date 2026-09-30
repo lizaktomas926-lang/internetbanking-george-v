@@ -119,15 +119,16 @@ export default function NovaPlatba() {
       />
 
       <div className="-mt-12 space-y-3 px-4 pb-20">
-        {/* Tlačidlo skenera QR / Faktúr */}
+                {/* Tlačidlo skenera QR / Faktúr */}
         <button
           type="button"
           onClick={() => setScannerOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-primary/15"
+          className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-border bg-surface py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted/50 active:scale-[0.99]"
         >
-          <QrCode className="size-4" />
-          Skenovať QR kód / Faktúru
+          <QrCode className="size-5 text-primary" />
+          <span>Skenovať QR kód / Faktúru</span>
         </button>
+
 
         {/* Formulár platby */}
         <form onSubmit={handleInitiatePayment} className="space-y-3">
