@@ -4,11 +4,11 @@ Potrebujem bankovú aplikáciu ktorá bude funkčná na prevody , históriu plat
 
 This project was built with [Lovable](https://lovable.dev).
 
-**Live app**: https://george-slsp.lovable.app
+**Live app**: https://internetbanking-george.lovable.app
 
 ## Build with Lovable
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8087d97b-64ff-4780-b07b-a5d0d46f1e1f).
+Continue developing this project in the [Lovable editor]https://lovable.dev/projects/2fd5c1ca-8333-4013-b476-c63b7d352dc0
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
 - **Stay in sync**: every change made in Lovable is committed straight to this repository.
