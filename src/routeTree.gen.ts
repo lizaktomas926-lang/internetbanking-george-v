@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedKartyRouteImport } from './routes/_authenticated/karty'
 import { Route as AuthenticatedNastaveniaRouteImport } from './routes/_authenticated/nastavenia'
 import { Route as AuthenticatedNovaPlatbaRouteImport } from './routes/_authenticated/nova-platba'
 import { Route as AuthenticatedPlatbyRouteImport } from './routes/_authenticated/platby'
@@ -33,6 +34,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedKartyRoute = AuthenticatedKartyRouteImport.update({
+  id: '/karty',
+  path: '/karty',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNastaveniaRoute = AuthenticatedNastaveniaRouteImport.update({
@@ -81,6 +87,7 @@ const AuthenticatedTransakciaIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/karty': typeof AuthenticatedKartyRoute
   '/nastavenia': typeof AuthenticatedNastaveniaRoute
   '/nova-platba': typeof AuthenticatedNovaPlatbaRoute
   '/platby': typeof AuthenticatedPlatbyRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/karty': typeof AuthenticatedKartyRoute
   '/nastavenia': typeof AuthenticatedNastaveniaRoute
   '/nova-platba': typeof AuthenticatedNovaPlatbaRoute
   '/platby': typeof AuthenticatedPlatbyRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/karty': typeof AuthenticatedKartyRoute
   '/_authenticated/nastavenia': typeof AuthenticatedNastaveniaRoute
   '/_authenticated/nova-platba': typeof AuthenticatedNovaPlatbaRoute
   '/_authenticated/platby': typeof AuthenticatedPlatbyRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/karty'
     | '/nastavenia'
     | '/nova-platba'
     | '/platby'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/karty'
     | '/nastavenia'
     | '/nova-platba'
     | '/platby'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/karty'
     | '/_authenticated/nastavenia'
     | '/_authenticated/nova-platba'
     | '/_authenticated/platby'
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/karty': {
+      id: '/_authenticated/karty'
+      path: '/karty'
+      fullPath: '/karty'
+      preLoaderRoute: typeof AuthenticatedKartyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/nastavenia': {
@@ -244,6 +263,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedKartyRoute: typeof AuthenticatedKartyRoute
   AuthenticatedNastaveniaRoute: typeof AuthenticatedNastaveniaRoute
   AuthenticatedNovaPlatbaRoute: typeof AuthenticatedNovaPlatbaRoute
   AuthenticatedPlatbyRoute: typeof AuthenticatedPlatbyRoute
@@ -256,6 +276,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedKartyRoute: AuthenticatedKartyRoute,
   AuthenticatedNastaveniaRoute: AuthenticatedNastaveniaRoute,
   AuthenticatedNovaPlatbaRoute: AuthenticatedNovaPlatbaRoute,
   AuthenticatedPlatbyRoute: AuthenticatedPlatbyRoute,
