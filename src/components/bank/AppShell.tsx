@@ -1,3 +1,4 @@
+import { Home, ArrowLeftRight, PiggyBank, PieChart, CreditCard, Moon, Sun } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -5,11 +6,12 @@ import { Home, ArrowLeftRight, PiggyBank, PieChart, Moon, Sun } from "lucide-rea
 import { Button } from "@/components/ui/button";
 
 const tabs = [
-  { to: "/", label: "Prehľad", icon: Home },
-  { to: "/platby", label: "Platby", icon: ArrowLeftRight },
-  { to: "/sporenie", label: "Sporenie", icon: PiggyBank },
-  { to: "/rozpocet", label: "Rozpočet", icon: PieChart },
-] as const;
+    { to: "/", label: "Prehľad", icon: Home },
+      { to: "/platby", label: "Platby", icon: ArrowLeftRight },
+        { to: "/karty", label: "Karty", icon: CreditCard },
+          { to: "/sporenie", label: "Sporenie", icon: PiggyBank },
+            { to: "/rozpocet", label: "Rozpočet", icon: PieChart },
+            ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   return <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background pb-28">{children}</div>;
@@ -39,7 +41,7 @@ export function PersistentBottomNav() {
 
   return createPortal(
       <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-border bg-surface/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgb(0_0_0/0.08)] backdrop-blur-xl">
-        <div className="grid grid-cols-5 px-1">
+        <div className="grid grid-cols-6 px-1">
           {tabs.map(({ to, label, icon: Icon }) => {
             const active = to === "/" ? path === "/" : path.startsWith(to);
             return (
