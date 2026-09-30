@@ -18,58 +18,28 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 export function PersistentBottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const [light, setLight] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem("george-theme");
-    const nextLight = saved === "light";
-    setLight(nextLight);
-    document.documentElement.classList.toggle("light", nextLight);
-    setMounted(true);
-  }, []);
-
-  function toggleTheme() {
-    const nextLight = !light;
-    setLight(nextLight);
-    document.documentElement.classList.toggle("light", nextLight);
-    window.localStorage.setItem("george-theme", nextLight ? "light" : "dark");
-  }
-
-  if (!mounted) return null;
 
   return createPortal(
-      <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-border bg-surface/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgb(0_0_0/0.08)] backdrop-blur-xl">
-        <div className="grid grid-cols-6 px-1">
-          {tabs.map(({ to, label, icon: Icon }) => {
-            const active = to === "/" ? path === "/" : path.startsWith(to);
-            return (
-              <Link
-                key={to}
-                to={to}
-                className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-semibold transition-colors ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                <Icon className="size-5" strokeWidth={active ? 2.4 : 1.8} />
-                {label}
-              </Link>
-            );
-          })}
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={toggleTheme}
-            aria-label={light ? "Zapnúť nočný režim" : "Zapnúť denný režim"}
-            title={light ? "Nočný režim" : "Denný režim"}
-            className="h-auto flex-col gap-1 rounded-xl py-1.5 text-[11px] font-semibold text-muted-foreground shadow-none hover:bg-transparent hover:text-primary [&_svg]:size-5"
-          >
-            {light ? <Moon strokeWidth={1.8} /> : <Sun strokeWidth={1.8} />}
-            <span>{light ? "Nočný" : "Denný"}</span>
-          </Button>
-        </div>
-      </nav>,
-      document.body,
+    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-border bg-surface/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgb(0_0_0/0.08)] backdrop-blur-xl">
+      <div className="grid grid-cols-5 px-1">
+        {tabs.map(({ to, label, icon: Icon }) => {
+          const active = to === "/" ? path === "/" : path.startsWith(to);
+          return (
+            <Link
+              key={to}
+              to={to}
+              className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-semibold transition-colors ${
+                active ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <Icon className="size-5" strokeWidth={active ? 2.4 : 1.8} />
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>,
+    document.body,
   );
 }
 
