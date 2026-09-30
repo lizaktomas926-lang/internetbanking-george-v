@@ -127,6 +127,27 @@ function toggleTheme() {
         <h1 className="text-2xl font-bold">Nastavenia</h1>
       </div>
 
+      <section className="mb-5 flex items-center justify-between rounded-2xl border border-border bg-surface p-4">
+  <div className="flex items-center gap-3">
+    <span className="grid size-10 place-items-center rounded-xl bg-surface-2 text-primary">
+      {light ? <Sun className="size-5" /> : <Moon className="size-5" />}
+    </span>
+    <div>
+      <h2 className="text-sm font-semibold">Motív aplikácie</h2>
+      <p className="text-xs text-muted-foreground">
+        {light ? "Aktívny svetlý režim" : "Aktívny tmavý režim"}
+      </p>
+    </div>
+  </div>
+  <button
+    type="button"
+    onClick={toggleTheme}
+    className="rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-border/40"
+  >
+    Prepnúť na {light ? "tmavý" : "svetlý"}
+  </button>
+</section> 
+      
       <section className="mb-5 rounded-2xl border border-border bg-surface p-4">
         <div className="flex items-start gap-3">
           <Fingerprint className="mt-0.5 size-5 text-primary" />
@@ -151,27 +172,6 @@ function toggleTheme() {
           {bioBusy ? "Overujem…" : bioOn ? "Vypnúť odomykanie biometriou" : "Zapnúť odomykanie biometriou"}
         </button>
       </section>
-<section className="mb-5 flex items-center justify-between rounded-2xl border border-border bg-surface p-4">
-  <div className="flex items-center gap-3">
-    <span className="grid size-10 place-items-center rounded-xl bg-surface-2 text-primary">
-      {light ? <Sun className="size-5" /> : <Moon className="size-5" />}
-    </span>
-    <div>
-      <h2 className="text-sm font-semibold">Motív aplikácie</h2>
-      <p className="text-xs text-muted-foreground">
-        {light ? "Aktívny svetlý režim" : "Aktívny tmavý režim"}
-      </p>
-    </div>
-  </div>
-  <button
-    type="button"
-    onClick={toggleTheme}
-    className="rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-border/40"
-  >
-    Prepnúť na {light ? "tmavý" : "svetlý"}
-  </button>
-</section>
-
       
       <section className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="text-sm font-semibold text-muted-foreground">Môj účet</h2>
