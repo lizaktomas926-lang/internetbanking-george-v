@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bell, Fingerprint, LogOut } from "lucide-react";
+import { ArrowLeft, Bell, Fingerprint, LogOut, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,6 +46,21 @@ function Nastavenia() {
     setIban(s.iban);
   }, [s.owner, s.iban]);
 
+  const [light, setLight] = useState(false);
+
+useEffect(() => {
+  const saved = window.localStorage.getItem("george-theme");
+  const isLight = saved === "light";
+  setLight(isLight);
+  document.documentElement.classList.toggle("light", isLight);
+}, []);
+
+function toggleTheme() {
+  const nextLight = !light;
+  setLight(nextLight);
+  document.documentElement.classList.toggle("light", nextLight);
+  window.localStorage.setItem("george-theme", nextLight ? "light" : "dark");
+}
   const [userId, setUserId] = useState<string | null>(null);
   const [bioSupported, setBioSupported] = useState(false);
   const [bioOn, setBioOn] = useState(false);
