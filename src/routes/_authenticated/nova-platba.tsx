@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Fingerprint } from "lucide-react";
+import { Fingerprint, ShieldCheck, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
 import { enableBiometric, isBiometricEnabled, isBiometricSupported, verifyBiometric } from "@/lib/biometric";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import {
@@ -16,19 +16,7 @@ export const Route = createFileRoute("/_authenticated/nova-platba")({
   head: () => ({
     meta: [
       { title: "Nová platba | George" },
-      {
-        name: "description",
-        content:
-          "Zadajte prevod na IBAN príjemcu, sumu a správu pre príjemcu.",
-      },
-      { property: "og:title", content: "Nová platba | George" },
-      {
-        property: "og:description",
-        content:
-          "Zadajte prevod na IBAN príjemcu, sumu a správu pre príjemcu.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "description", content: "Zadajte prevod s biometrickým potvrdením v George." },
     ],
   }),
   component: NovaPlatba,
@@ -40,70 +28,86 @@ const field =
 function NovaPlatba() {
   const s = useBank();
   const navigate = useNavigate();
+  const { user } = Route.useRouteContext();
 
   const [name, setName] = useState("");
   const [iban, setIban] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Prevod");
   const [note, setNote] = useState("");
+  const [vs, setVs] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const { user } = Route.useRouteContext();
-  const [bioOn, setBioOn] = useState(false);
-  useEffect(() => setBioOn(isBiometricEnabled(user.id)), [user.id]);
+  const [bioSupported, setBioSupported] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  useEffect(() => {
+    void isBiometricSupported().then(setBioSupported);
+  }, []);
 
   const value = Number(amount.replace(",", "."));
 
-  async function submit(e: React.FormEvent) {
+  // 1. Krok: Validácia a otvorenie rekapitulácie
+  function handleInitiatePayment(e: React.FormEvent) {
     e.preventDefault();
-    if (busy) return;
     setError("");
 
     if (!name.trim()) {
       return setError("Zadajte meno príjemcu.");
     }
-
     if (!iban.trim()) {
       return setError("Zadajte IBAN príjemcu.");
     }
-
     if (!Number.isFinite(value) || value <= 0) {
       return setError("Zadajte platnú sumu.");
     }
-
-    setBusy(true);
-    try {
-      if (!(await isBiometricSupported())) {
-        throw new Error("Toto zariadenie alebo okno nepodporuje odtlačok ani tvár. Otvorte aplikáciu priamo v Safari alebo z plochy.");
-      }
-      if (!isBiometricEnabled(user.id)) {
-        await enableBiometric(user.id, user.email ?? "George");
-        setBioOn(true);
-      } else {
-        const ok = await verifyBiometric(user.id);
-        if (!ok) throw new Error("Overenie odtlačkom alebo tvárou zlyhalo. Skúste znova.");
-      }
-    } catch (err) {
-      setBusy(false);
-      toast.error("Platba nebola potvrdená biometriou");
-      const msg = err instanceof Error && err.name !== "NotAllowedError" ? err.message : "";
-      return setError(msg || "Overenie bolo zrušené alebo zlyhalo. Skúste znova.");
+    if (value > balance(s)) {
+      return setError("Nedostatočný zostatok na účte.");
     }
-    setBusy(false);
 
-    addTransaction({
-      type: "out",
-      counterparty: name.trim(),
-      iban: iban.trim().toUpperCase(),
-      amount: Math.round(value * 100) / 100,
-      date: new Date().toISOString(),
-      category,
-      ...(note.trim() ? { note: note.trim() } : {}),
-    });
+    setShowConfirmModal(true);
+  }
 
-    toast.success("Platba bola úspešne odoslaná");
+  // 2. Krok: Spustenie biometrického overenia a odoslanie
+  async function confirmWithBiometrics() {
+    setBusy(true);
+    setError("");
 
-    navigate({ to: "/platby" });
+    try {
+      if (bioSupported) {
+        if (!isBiometricEnabled(user.id)) {
+          // Prvá registrácia biometrie na zariadení
+          await enableBiometric(user.id, user.email ?? "George");
+        } else {
+          // Overenie odtlačkom / Face ID
+          const verified = await verifyBiometric(user.id);
+          if (!verified) throw new Error("Overenie biometriou zlyhalo.");
+        }
+      }
+
+      // Po úspešnom overení zaúčtujeme transakciu
+      addTransaction({
+        type: "out",
+        counterparty: name.trim(),
+        iban: iban.trim().toUpperCase(),
+        amount: Math.round(value * 100) / 100,
+        date: new Date().toISOString(),
+        category,
+        ...(vs.trim() ? { vs: vs.trim() } : {}),
+        ...(note.trim() ? { note: note.trim() } : {}),
+      });
+
+      setShowConfirmModal(false);
+      toast.success("Platba bola úspešne autorizovaná a odoslaná");
+      navigate({ to: "/platby" });
+    } catch (err) {
+      console.error(err);
+      toast.error("Autorizácia platby bola prerušená");
+      const msg = err instanceof Error && err.name !== "NotAllowedError" ? err.message : "";
+      setError(msg || "Overenie odtlačkom/tvárou bolo zrušené alebo zlyhalo.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -114,28 +118,22 @@ function NovaPlatba() {
         back
       />
 
-      <form onSubmit={submit} className="-mt-12 space-y-3 px-4">
-        <div className="space-y-3 rounded-3xl bg-surface p-4">
+      <form onSubmit={handleInitiatePayment} className="-mt-12 space-y-3 px-4 pb-20">
+        <div className="space-y-3 rounded-3xl bg-surface p-4 shadow-sm">
           <label className="block">
-            <span className="text-[12px] text-muted-foreground">
-              Príjemca
-            </span>
-
+            <span className="text-[12px] text-muted-foreground">Príjemca</span>
             <input
               className={`${field} mt-1`}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Meno a priezvisko"
+              placeholder="Meno a priezvisko alebo názov firmy"
             />
           </label>
 
           <label className="block">
-            <span className="text-[12px] text-muted-foreground">
-              IBAN / číslo účtu
-            </span>
-
+            <span className="text-[12px] text-muted-foreground">IBAN / číslo účtu</span>
             <input
-              className={`${field} mt-1 font-mono tracking-wide`}
+              className={`${field} mt-1 font-mono tracking-wide uppercase`}
               value={iban}
               onChange={(e) => setIban(e.target.value)}
               placeholder="SK00 0000 0000 0000 0000 0000"
@@ -143,12 +141,9 @@ function NovaPlatba() {
           </label>
 
           <label className="block">
-            <span className="text-[12px] text-muted-foreground">
-              Suma (€)
-            </span>
-
+            <span className="text-[12px] text-muted-foreground">Suma (€)</span>
             <input
-              className={`${field} mt-1 text-[22px] font-bold`}
+              className={`${field} mt-1 text-[24px] font-bold text-foreground`}
               inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -156,56 +151,124 @@ function NovaPlatba() {
             />
           </label>
 
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block">
+              <span className="text-[12px] text-muted-foreground">Kategória</span>
+              <select
+                className={`${field} mt-1`}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] text-muted-foreground">Variabilný symbol</span>
+              <input
+                className={`${field} mt-1 font-mono`}
+                inputMode="numeric"
+                value={vs}
+                onChange={(e) => setVs(e.target.value)}
+                placeholder="10 čísel"
+              />
+            </label>
+          </div>
+
           <label className="block">
-            <span className="text-[12px] text-muted-foreground">
-              Kategória
-            </span>
-
-            <select
-              className={`${field} mt-1`}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="text-[12px] text-muted-foreground">
-              Správa pre príjemcu
-            </span>
-
+            <span className="text-[12px] text-muted-foreground">Správa pre príjemcu</span>
             <input
               className={`${field} mt-1`}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Nepovinné"
+              placeholder="Poznámka k platbe"
             />
           </label>
         </div>
 
         {error ? (
-          <p className="px-1 text-[13px] text-expense">{error}</p>
+          <div className="flex items-center gap-2 rounded-2xl bg-destructive/10 p-3 text-[13px] text-destructive">
+            <AlertCircle className="size-4 shrink-0" />
+            <span>{error}</span>
+          </div>
         ) : null}
 
         <button
           type="submit"
-          disabled={busy}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-semibold text-primary-foreground disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-semibold text-primary-foreground shadow-md transition-opacity hover:opacity-95"
         >
-          {bioOn ? <Fingerprint className="h-5 w-5" /> : null}
-          {busy ? "Overujem…" : bioOn ? "Potvrdiť biometriou a odoslať" : "Odoslať platbu"}
+          <span>Pokračovať na autorizáciu</span>
+          <ArrowRight className="size-4" />
         </button>
-        {!bioOn ? (
-          <p className="px-1 text-center text-[12px] text-muted-foreground">
-            Potvrdzovanie platieb odtlačkom alebo tvárou zapnete v Nastaveniach.
-          </p>
-        ) : null}
+
+        <p className="flex items-center justify-center gap-1.5 text-center text-[12px] text-muted-foreground">
+          <ShieldCheck className="size-4 text-emerald-600" />
+          Platba bude overená biometriou zariadenia
+        </p>
       </form>
+
+      {/* Rekapitulácia a biometrická autorizácia */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center">
+          <div className="w-full max-w-[400px] rounded-3xl bg-surface p-6 shadow-2xl">
+            <div className="text-center">
+              <div className="mx-auto grid size-14 place-items-center rounded-full bg-primary/15 text-primary">
+                <Fingerprint className="size-8" />
+              </div>
+              <h3 className="mt-3 text-[18px] font-bold">Potvrdenie platby</h3>
+              <p className="mt-1 text-[13px] text-muted-foreground">
+                Skontrolujte detaily platby a autorizujte prevod.
+              </p>
+            </div>
+
+            <div className="my-5 space-y-2 rounded-2xl bg-surface-2 p-4 text-[13px]">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Suma:</span>
+                <span className="font-bold text-foreground text-[15px]">{formatEur(value)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Príjemca:</span>
+                <span className="font-semibold text-foreground">{name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">IBAN:</span>
+                <span className="font-mono text-[11px] text-foreground">{iban}</span>
+              </div>
+              {vs && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">VS:</span>
+                  <span className="font-mono text-foreground">{vs}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={confirmWithBiometrics}
+                disabled={busy}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-semibold text-primary-foreground shadow-md transition-opacity hover:opacity-95 disabled:opacity-60"
+              >
+                <Fingerprint className="size-5" />
+                {busy ? "Overujem biometriu…" : "Potvrdiť biometriou"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                disabled={busy}
+                className="h-11 w-full rounded-2xl bg-transparent text-[13px] font-semibold text-muted-foreground hover:bg-surface-2"
+              >
+                Zrušiť
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
