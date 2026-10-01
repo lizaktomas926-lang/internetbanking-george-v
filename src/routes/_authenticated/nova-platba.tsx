@@ -113,7 +113,7 @@ export default function NovaPlatba() {
 
   return (
     <AppShell>
-      <BrandHeader
+       <BrandHeader
         title="Nová platba"
         subtitle={`Z účtu · ${formatEur(balance(s))}`}
         back
