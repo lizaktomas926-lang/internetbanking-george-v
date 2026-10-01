@@ -41,8 +41,7 @@ function Prijat() {
       category,
     });
     navigate({ to: "/platby" });
-  }
-
+  
   return (
     <AppShell>
             <BrandHeader title="Prijať peniaze" subtitle="Váš účet pre príchodzie platby" back />
