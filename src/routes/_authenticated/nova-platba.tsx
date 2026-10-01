@@ -113,16 +113,24 @@ export default function NovaPlatba() {
 
   return (
     <AppShell>
-       <BrandHeader
+             <BrandHeader
         title="Nová platba"
         subtitle={`Z účtu · ${formatEur(balance(s))}`}
         back
+        action={
+          <button
+            type="button"
+            onClick={() => setScannerOpen(true)}
+            aria-label="Skenovať QR kód / Faktúru"
+            className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition hover:bg-muted/60 active:scale-95"
+          >
+            <QrCode className="size-4 text-primary" />
+            <span>Skenovať</span>
+          </button>
+        }
       />
 
-      <div className="-mt-12 space-y-3 px-4 pb-20">
-                {/* Tlačidlo skenera QR / Faktúr */}
-        <button
-          type="button"
+      <div className="space-y-3 px-4 pb-24">
           onClick={() => setScannerOpen(true)}
           className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-border bg-surface py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted/50 active:scale-[0.99]"
         >
