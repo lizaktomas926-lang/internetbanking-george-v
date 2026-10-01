@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { enableBiometric, isBiometricEnabled, isBiometricSupported, verifyBiometric } from "@/lib/biometric";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
+import { RecipientPicker } from "@/components/bank/RecipientPicker";
 import {
   addTransaction,
   balance,
