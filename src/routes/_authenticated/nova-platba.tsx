@@ -113,7 +113,7 @@ export default function NovaPlatba() {
 
   return (
     <AppShell>
-             <BrandHeader
+      <BrandHeader
         title="Nová platba"
         subtitle={`Z účtu · ${formatEur(balance(s))}`}
         back
@@ -131,13 +131,14 @@ export default function NovaPlatba() {
       />
 
       <div className="space-y-3 px-4 pb-24">
+        <button
+          type="button"
           onClick={() => setScannerOpen(true)}
           className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-border bg-surface py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted/50 active:scale-[0.99]"
-          {>} 
+        >
           <QrCode className="size-5 text-primary" />
           <span>Skenovať QR kód / Faktúru</span>
         </button>
-
 
         <RecipientPicker
           userId={user.id}
@@ -380,10 +381,8 @@ function QrScannerModal({
   }
 
   async function startDetection() {
-    // natívne BarcodeDetector API
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
-        // BarcodeDetector
         const detector = new (window.BarcodeDetector as any)({ formats: ["qr_code"] });
 
         const interval = setInterval(async () => {
@@ -421,14 +420,12 @@ function QrScannerModal({
     if (!file) return;
 
     setErrorMsg("");
-    // BarcodeDetector
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         const img = new Image();
         img.src = URL.createObjectURL(file);
         await img.decode();
 
-        // BarcodeDetector
         const detector = new (window.BarcodeDetector as any)({ formats: ["qr_code"] });
         const barcodes = await detector.detect(img);
 
