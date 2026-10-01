@@ -131,6 +131,17 @@ export default function NovaPlatba() {
         </button>
 
 
+        <RecipientPicker
+          userId={user.id}
+          transactions={s.transactions}
+          current={{ name, iban }}
+          onPick={(r) => {
+            setName(r.name);
+            setIban(r.iban);
+            if (r.category) setCategory(r.category);
+          }}
+        />
+
         {/* Formulár platby */}
         <form onSubmit={handleInitiatePayment} className="space-y-3">
           <div className="space-y-3 rounded-3xl bg-surface p-4 shadow-sm">
