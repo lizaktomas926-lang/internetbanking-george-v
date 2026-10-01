@@ -360,7 +360,7 @@ function QrScannerModal({
   }
 
   async function startDetection() {
-    // @ts-expect-error - natívne BarcodeDetector API
+    // natívne BarcodeDetector API
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         // BarcodeDetector
@@ -401,7 +401,7 @@ function QrScannerModal({
     if (!file) return;
 
     setErrorMsg("");
-    // @ts-expect-error
+    // BarcodeDetector
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         const img = new Image();
