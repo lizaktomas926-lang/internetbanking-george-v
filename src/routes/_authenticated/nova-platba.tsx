@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { enableBiometric, isBiometricEnabled, isBiometricSupported, verifyBiometric } from "@/lib/biometric";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
+import { RecipientPicker } from "@/components/bank/RecipientPicker";
 import {
   addTransaction,
   balance,
@@ -129,6 +130,17 @@ export default function NovaPlatba() {
           <span>Skenovať QR kód / Faktúru</span>
         </button>
 
+
+        <RecipientPicker
+          userId={user.id}
+          transactions={s.transactions}
+          current={{ name, iban }}
+          onPick={(r) => {
+            setName(r.name);
+            setIban(r.iban);
+            if (r.category) setCategory(r.category);
+          }}
+        />
 
         {/* Formulár platby */}
         <form onSubmit={handleInitiatePayment} className="space-y-3">
