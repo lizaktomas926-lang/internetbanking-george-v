@@ -1,9 +1,9 @@
 export interface ParsedPaymentData {
-  iban?: string;
-  amount?: string;
-  recipientName?: string;
-  vs?: string;
-  note?: string;
+  iban?: string | undefined;
+  amount?: string | undefined;
+  recipientName?: string | undefined;
+  vs?: string | undefined;
+  note?: string | undefined;
 }
 
 export function parsePaymentQr(raw: string): ParsedPaymentData | null {
@@ -53,9 +53,9 @@ export function parsePaymentQr(raw: string): ParsedPaymentData | null {
 
   if (ibanMatch) {
     return {
-      iban: ibanMatch[0].replace(/\s+/g, "").toUpperCase(),
-      amount: amountMatch ? amountMatch[1].replace(",", ".") : undefined,
-      vs: vsMatch ? vsMatch[1] : undefined,
+      iban: (ibanMatch[0] ?? "").replace(/\s+/g, "").toUpperCase(),
+      amount: amountMatch?.[1]?.replace(",", ".") ?? undefined,
+      vs: vsMatch?.[1] ?? undefined,
     };
   }
 

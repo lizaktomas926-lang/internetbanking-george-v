@@ -360,11 +360,11 @@ function QrScannerModal({
   }
 
   async function startDetection() {
-    // @ts-expect-error - natívne BarcodeDetector API
+    // natívne BarcodeDetector API
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
-        // @ts-expect-error
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        // BarcodeDetector
+        const detector = new (window.BarcodeDetector as any)({ formats: ["qr_code"] });
 
         const interval = setInterval(async () => {
           if (!videoRef.current || !streamRef.current) {
@@ -401,15 +401,15 @@ function QrScannerModal({
     if (!file) return;
 
     setErrorMsg("");
-    // @ts-expect-error
+    // BarcodeDetector
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         const img = new Image();
         img.src = URL.createObjectURL(file);
         await img.decode();
 
-        // @ts-expect-error
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        // BarcodeDetector
+        const detector = new (window.BarcodeDetector as any)({ formats: ["qr_code"] });
         const barcodes = await detector.detect(img);
 
         if (barcodes.length > 0) {
