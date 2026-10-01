@@ -45,10 +45,10 @@ function Prijat() {
 
   return (
     <AppShell>
-      <BrandHeader title="Prijať peniaze" subtitle="Váš účet pre príchodzie platby" back />
+            <BrandHeader title="Prijať peniaze" subtitle="Váš účet pre príchodzie platby" back />
 
-      <div className="-mt-12 space-y-3 px-4">
-        <section className="rounded-3xl bg-surface p-5">
+      <div className="space-y-3 px-4 pb-24">
+
           <p className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">Môj IBAN</p>
           <p className="mt-2 font-mono text-[16px] tracking-wide">{s.iban}</p>
           <p className="mt-1 text-[13px] text-muted-foreground">{s.owner}</p>
