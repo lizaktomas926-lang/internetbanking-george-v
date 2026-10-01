@@ -13,7 +13,8 @@
   },
   "overrides": {
     "rolldown": "1.2.1",
-    "js-yaml": "^4.3.2"
+    "js-yaml": "^4.3.2",
+    "brace-expansion": "^1.1.21"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.3.7",
