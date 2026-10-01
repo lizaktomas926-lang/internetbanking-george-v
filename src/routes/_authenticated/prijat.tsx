@@ -1,17 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Copy, Check, ArrowDownLeft } from "lucide-react";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import { addTransaction, CATEGORIES, useBank } from "@/lib/bank-store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/prijat")({
   head: () => ({
     meta: [
-      { title: "Prijatý prevod | George" },
+      { title: "Prijať peniaze | George" },
       { name: "description", content: "Zaevidujte prijatý prevod alebo zdieľajte svoj IBAN pre platbu." },
-      { property: "og:title", content: "Prijatý prevod | George" },
-      { property: "og:description", content: "Zaevidujte prijatý prevod alebo zdieľajte svoj IBAN pre platbu." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Prijat,
@@ -20,19 +18,28 @@ export const Route = createFileRoute("/_authenticated/prijat")({
 const field =
   "w-full rounded-2xl border border-border bg-surface px-4 py-3 text-[15px] outline-none placeholder:text-muted-foreground focus:border-primary";
 
-function Prijat() {
+export default function Prijat() {
   const s = useBank();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Ostatné príjmy");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  function copyIban() {
+    navigator.clipboard.writeText(s.iban);
+    setCopied(true);
+    toast.success("IBAN bol skopírovaný do schránky");
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const value = Number(amount.replace(",", "."));
     if (!name.trim()) return setError("Zadajte odosielateľa.");
     if (!Number.isFinite(value) || value <= 0) return setError("Zadajte platnú sumu.");
+
     addTransaction({
       type: "in",
       counterparty: name.trim(),
@@ -40,39 +47,103 @@ function Prijat() {
       date: new Date().toISOString(),
       category,
     });
+    toast.success("Prijatý prevod bol zaevidovaný");
     navigate({ to: "/platby" });
-  
+  }
+
   return (
     <AppShell>
-            <BrandHeader title="Prijať peniaze" subtitle="Váš účet pre príchodzie platby" back />
+      <BrandHeader
+        title="Prijať peniaze"
+        subtitle="Váš účet pre príchodzie platby"
+        back
+      />
 
-      <div className="space-y-3 px-4 pb-24">
-
-          <p className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">Môj IBAN</p>
-          <p className="mt-2 font-mono text-[16px] tracking-wide">{s.iban}</p>
+      <div className="space-y-4 px-4 pb-24">
+        {/* Karta s vlastným IBAN-om */}
+        <section className="rounded-3xl bg-surface p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Môj IBAN
+            </p>
+            <button
+              type="button"
+              onClick={copyIban}
+              className="flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-semibold text-foreground transition hover:bg-border/40"
+            >
+              {copied ? (
+                <>
+                  <Check className="size-3.5 text-emerald-600" />
+                  <span>Skopírované</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="size-3.5 text-primary" />
+                  <span>Kopírovať</span>
+                </>
+              )}
+            </button>
+          </div>
+          <p className="mt-3 font-mono text-[17px] font-bold tracking-wide text-foreground">
+            {s.iban}
+          </p>
           <p className="mt-1 text-[13px] text-muted-foreground">{s.owner}</p>
         </section>
 
-        <form onSubmit={submit} className="space-y-3 rounded-3xl bg-surface p-4">
-          <p className="text-[14px] font-semibold">Zaevidovať prijatý prevod</p>
-          <input className={field} value={name} onChange={(e) => setName(e.target.value)} placeholder="Odosielateľ" />
-          <input
-            className={`${field} text-[22px] font-bold`}
-            inputMode="decimal"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0,00"
-          />
-          <select className={field} value={category} onChange={(e) => setCategory(e.target.value)}>
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          {error ? <p className="text-[13px] text-expense">{error}</p> : null}
-          <button type="submit" className="h-12 w-full rounded-2xl bg-income/20 text-[15px] font-semibold text-income">
-            Pridať príjem
+        {/* Formulár pre zaevidovanie platby */}
+        <form onSubmit={submit} className="space-y-3 rounded-3xl bg-surface p-5 shadow-sm">
+          <div className="flex items-center gap-2 pb-1 text-[15px] font-bold text-foreground">
+            <ArrowDownLeft className="size-4.5 text-income" />
+            <span>Zaevidovať prijatý prevod</span>
+          </div>
+
+          <label className="block">
+            <span className="text-[12px] text-muted-foreground">Odosielateľ</span>
+            <input
+              className={`${field} mt-1`}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Meno odosielateľa alebo spoločnosti"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-[12px] text-muted-foreground">Suma (€)</span>
+            <input
+              className={`${field} mt-1 text-[22px] font-bold text-foreground`}
+              inputMode="decimal"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0,00"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-[12px] text-muted-foreground">Kategória</span>
+            <select
+              className={`${field} mt-1`}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {error ? (
+            <p className="rounded-xl bg-destructive/10 p-2.5 text-[13px] font-medium text-destructive">
+              {error}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-income text-[15px] font-semibold text-white shadow-md transition-opacity hover:opacity-95"
+          >
+            <span>Pridať príjem na účet</span>
           </button>
         </form>
       </div>
