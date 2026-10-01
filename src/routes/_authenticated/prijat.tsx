@@ -26,29 +26,41 @@ export default function Prijat() {
   const [category, setCategory] = useState("Ostatné príjmy");
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   function copyIban() {
+    if (!s.iban) return;
     navigator.clipboard.writeText(s.iban);
     setCopied(true);
     toast.success("IBAN bol skopírovaný do schránky");
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+
     const value = Number(amount.replace(",", "."));
     if (!name.trim()) return setError("Zadajte odosielateľa.");
     if (!Number.isFinite(value) || value <= 0) return setError("Zadajte platnú sumu.");
 
-    addTransaction({
-      type: "in",
-      counterparty: name.trim(),
-      amount: Math.round(value * 100) / 100,
-      date: new Date().toISOString(),
-      category,
-    });
-    toast.success("Prijatý prevod bol zaevidovaný");
-    navigate({ to: "/platby" });
+    setBusy(true);
+    try {
+      await addTransaction({
+        type: "in",
+        counterparty: name.trim(),
+        amount: Math.round(value * 100) / 100,
+        date: new Date().toISOString(),
+        category,
+      });
+      toast.success("Prijatý prevod bol zaevidovaný");
+      navigate({ to: "/platby" });
+    } catch (err) {
+      console.error(err);
+      setError("Nepodarilo sa uložiť príjem.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -85,9 +97,9 @@ export default function Prijat() {
             </button>
           </div>
           <p className="mt-3 font-mono text-[17px] font-bold tracking-wide text-foreground">
-            {s.iban}
+            {s.iban || "Načítavam IBAN..."}
           </p>
-          <p className="mt-1 text-[13px] text-muted-foreground">{s.owner}</p>
+          <p className="mt-1 text-[13px] text-muted-foreground">{s.owner || "Klient George"}</p>
         </section>
 
         {/* Formulár pre zaevidovanie platby */}
@@ -141,9 +153,10 @@ export default function Prijat() {
 
           <button
             type="submit"
-            className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-income text-[15px] font-semibold text-white shadow-md transition-opacity hover:opacity-95"
+            disabled={busy}
+            className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-income text-[15px] font-semibold text-white shadow-md transition-opacity hover:opacity-95 disabled:opacity-50"
           >
-            <span>Pridať príjem na účet</span>
+            <span>{busy ? "Ukladám príjem…" : "Pridať príjem na účet"}</span>
           </button>
         </form>
       </div>
