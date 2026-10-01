@@ -133,7 +133,7 @@ export default function NovaPlatba() {
       <div className="space-y-3 px-4 pb-24">
           onClick={() => setScannerOpen(true)}
           className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-border bg-surface py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted/50 active:scale-[0.99]"
-        >
+        {'>'} 
           <QrCode className="size-5 text-primary" />
           <span>Skenovať QR kód / Faktúru</span>
         </button>
