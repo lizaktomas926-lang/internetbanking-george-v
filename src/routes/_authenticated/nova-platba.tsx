@@ -363,7 +363,7 @@ function QrScannerModal({
     // @ts-expect-error - natívne BarcodeDetector API
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
-        // @ts-expect-error
+        // BarcodeDetector
         const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
 
         const interval = setInterval(async () => {
@@ -408,7 +408,7 @@ function QrScannerModal({
         img.src = URL.createObjectURL(file);
         await img.decode();
 
-        // @ts-expect-error
+        // BarcodeDetector
         const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
         const barcodes = await detector.detect(img);
 
