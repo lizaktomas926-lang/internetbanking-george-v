@@ -364,7 +364,7 @@ function QrScannerModal({
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         // BarcodeDetector
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        const detector = new (window.BarcodeDetector as any)({ formats: ["qr_code"] });
 
         const interval = setInterval(async () => {
           if (!videoRef.current || !streamRef.current) {
@@ -409,7 +409,7 @@ function QrScannerModal({
         await img.decode();
 
         // BarcodeDetector
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        const detector = new (window.BarcodeDetector as any)({ formats: ["qr_code"] });
         const barcodes = await detector.detect(img);
 
         if (barcodes.length > 0) {
