@@ -42,74 +42,85 @@
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 1.125rem;
   --font-display: "Outfit", system-ui, sans-serif;
   --font-body: "Manrope", system-ui, sans-serif;
 
-  --background: oklch(0.145 0.006 265);
-  --foreground: oklch(0.985 0 0);
-  --surface: oklch(0.205 0.008 265);
-  --surface-2: oklch(0.255 0.01 265);
-  --card: oklch(0.205 0.008 265);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0.008 265);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.63 0.2 256);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.255 0.01 265);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.255 0.01 265);
-  --muted-foreground: oklch(0.68 0.012 265);
-  --accent: oklch(0.3 0.03 256);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.65 0.21 22);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.3 0.008 265);
-  --input: oklch(0.28 0.008 265);
-  --ring: oklch(0.63 0.2 256);
+  /* Nočný režim (Dark mode) */
+  --background: #0f141c;
+  --foreground: #f8fafc;
+  --surface: #171f2b;
+  --surface-2: #212c3d;
+  --card: #171f2b;
+  --card-foreground: #f8fafc;
+  --popover: #171f2b;
+  --popover-foreground: #f8fafc;
+  --primary: #2970ee;
+  --primary-foreground: #ffffff;
+  --secondary: #212c3d;
+  --secondary-foreground: #f8fafc;
+  --muted: #212c3d;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #60a5fa;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #263346;
+  --input: #263346;
+  --ring: #2970ee;
 
-  --brand: oklch(0.38 0.17 5);
-  --brand-foreground: oklch(0.99 0 0);
-  --income: oklch(0.75 0.19 148);
-  --expense: oklch(0.68 0.2 20);
+  --brand: #9b115a;
+  --brand-foreground: #ffffff;
+  --income: #22c55e;
+  --expense: #ef4444;
 
-  --gradient-brand: linear-gradient(160deg, oklch(0.42 0.18 5), oklch(0.3 0.15 350));
+  --gradient-brand: linear-gradient(135deg, #1b6fe8 0%, #0d52b9 100%);
+  --gradient-account: linear-gradient(135deg, #9b115a 0%, #6e0c40 100%);
   color-scheme: dark;
 }
 
 .light {
-  --background: oklch(0.955 0.009 255);
-  --foreground: oklch(0.25 0.075 250);
-  --surface: oklch(0.995 0.003 255);
-  --surface-2: oklch(0.925 0.018 250);
-  --card: oklch(0.995 0.003 255);
-  --card-foreground: oklch(0.25 0.075 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.075 250);
-  --primary: oklch(0.62 0.2 252);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.925 0.018 250);
-  --secondary-foreground: oklch(0.3 0.07 250);
-  --muted: oklch(0.925 0.018 250);
-  --muted-foreground: oklch(0.52 0.045 250);
-  --accent: oklch(0.91 0.04 250);
-  --accent-foreground: oklch(0.45 0.16 252);
-  --destructive: oklch(0.56 0.2 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.87 0.018 250);
-  --input: oklch(0.87 0.018 250);
-  --ring: oklch(0.62 0.2 252);
-  --brand: oklch(0.62 0.2 252);
-  --brand-foreground: oklch(0.99 0 0);
-  --income: oklch(0.53 0.16 148);
-  --expense: oklch(0.56 0.2 25);
-  --gradient-brand: linear-gradient(160deg, oklch(0.66 0.2 250), oklch(0.57 0.2 257));
+  /* Denný režim (Light mode presne podľa videa) */
+  --background: #f4f6fa;
+  --foreground: #111827;
+  --surface: #ffffff;
+  --surface-2: #edf1f7;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #1e6ceb;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f4f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f4f9;
+  --muted-foreground: #64748b;
+  --accent: #e8f0fe;
+  --accent-foreground: #1e6ceb;
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #1e6ceb;
+
+  --brand: #b8136c;
+  --brand-foreground: #ffffff;
+  --income: #16a34a;
+  --expense: #dc2626;
+
+  --gradient-brand: linear-gradient(135deg, #1e6ceb 0%, #0f52ba 100%);
+  --gradient-account: linear-gradient(135deg, #b8136c 0%, #870b4d 100%);
   color-scheme: light;
 }
 
 @utility brand-header {
   background: var(--gradient-brand);
 }
+
+@utility account-header {
+  background: var(--gradient-account);
+}
+
 
 @keyframes screen-enter {
   from {
