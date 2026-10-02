@@ -63,7 +63,6 @@ export function QrScannerModal({ open, onClose, onScanSuccess }: Props) {
 
   // Detekcia QR kódu z videa
   async function startDetection() {
-    // @ts-expect-error - natívne BarcodeDetector API v moderných prehliadačoch
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         // @ts-expect-error
@@ -106,7 +105,6 @@ export function QrScannerModal({ open, onClose, onScanSuccess }: Props) {
     if (!file) return;
 
     setErrorMsg("");
-    // @ts-expect-error
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         const img = new Image();
