@@ -326,6 +326,18 @@ export async function removeBudget(category: string) {
   emit();
 }
 
+export async function updateTransactionCategory(id: string, category: string, note: string) {
+  const { error } = await supabase
+    .from("transactions")
+    .update({ category, note: note.trim() || null })
+    .eq("id", id);
+  if (error) throw error;
+  state.transactions = state.transactions.map((t) =>
+    t.id === id ? { ...t, category, note: note.trim() || undefined } : t,
+  );
+  emit();
+}
+
 export async function saveProfile(owner: string, iban: string) {
   const userId = await currentUserId();
   if (!userId) return;
