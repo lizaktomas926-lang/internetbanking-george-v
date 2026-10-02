@@ -23,7 +23,7 @@ import {
 import { parsePaymentQr, type ParsedPaymentData } from "@/lib/qr-parser";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/platby")({
+export const Route = createFileRoute("/_authenticated/nova-platba")({
   head: () => ({
     meta: [
       { title: "Nová platba | George" },

@@ -13,7 +13,6 @@ import {
 import { enableBiometric, isBiometricEnabled, isBiometricSupported, verifyBiometric } from "@/lib/biometric";
 import { AppShell, BrandHeader } from "@/components/bank/AppShell";
 import { RecipientPicker } from "@/components/bank/RecipientPicker";
-import { AiCategoryButton } from "@/components/bank/AiCategoryButton";
 import {
   addTransaction,
   balance,
@@ -186,16 +185,6 @@ export default function NovaPlatba() {
               />
             </label>
 
-            <label className="block">
-              <span className="text-[12px] text-muted-foreground">Popis platby / správa pre príjemcu</span>
-              <input
-                className={`${field} mt-1`}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="napr. nákup potravín v Lidli"
-              />
-            </label>
-
             <div className="grid grid-cols-2 gap-2">
               <label className="block">
                 <span className="text-[12px] text-muted-foreground">Kategória</span>
@@ -224,12 +213,15 @@ export default function NovaPlatba() {
               </label>
             </div>
 
-            <AiCategoryButton
-              description={note}
-              counterparty={name}
-              amount={Number(String(amount).replace(",", ".")) || 0}
-              onCategory={setCategory}
-            />
+            <label className="block">
+              <span className="text-[12px] text-muted-foreground">Správa pre príjemcu</span>
+              <input
+                className={`${field} mt-1`}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Poznámka k platbe"
+              />
+            </label>
           </div>
 
           {error ? (
