@@ -3,7 +3,8 @@ import { useState } from "react";
 import { FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/bank/AppShell";
-import { formatDate, formatEur, useBank } from "@/lib/bank-store";
+import { formatDate, formatEur, updateTransactionCategory, useBank } from "@/lib/bank-store";
+import { AiCategoryButton } from "@/components/bank/AiCategoryButton";
 import { exportReceipt } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/transakcia/$id")({
@@ -34,6 +35,7 @@ function Detail() {
   const s = useBank();
   const t = s.transactions.find((x) => x.id === id);
   const [busy, setBusy] = useState(false);
+  const [desc, setDesc] = useState<string | null>(null);
 
   if (!t) {
     return (
@@ -76,6 +78,24 @@ function Detail() {
           {t.iban ? <Row label="IBAN protistrany" value={t.iban} /> : null}
           {t.vs ? <Row label="Konštantný symbol" value={t.vs} /> : null}
           {t.note ? <Row label="Poznámka" value={t.note} /> : null}
+        </section>
+
+        <section className="space-y-2 rounded-2xl bg-surface p-4">
+          <p className="text-[12px] text-muted-foreground">Popis platby pre rozpočet</p>
+          <input
+            value={desc ?? t.note ?? ""}
+            onChange={(e) => setDesc(e.target.value)}
+            placeholder="napr. obed s kolegami"
+            className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-[14px] outline-none focus:border-primary"
+          />
+          <AiCategoryButton
+            label="Prekategorizovať pomocou AI"
+            description={desc ?? t.note ?? ""}
+            counterparty={t.counterparty}
+            amount={t.amount}
+            type={t.type}
+            onCategory={(c) => updateTransactionCategory(t.id, c, desc ?? t.note ?? "")}
+          />
         </section>
 
         <button
