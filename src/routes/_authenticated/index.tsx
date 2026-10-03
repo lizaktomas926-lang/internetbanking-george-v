@@ -349,9 +349,8 @@ export default function GeorgePrehlad() {
                 <span className="font-mono font-semibold text-foreground">GIBASBX</span>
               </div>
             </div>
-              </AppShell>
-  );
-}
-
         </div>
       </div>
+            </AppShell>
+  );
+}
