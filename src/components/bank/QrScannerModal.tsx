@@ -105,15 +105,13 @@ export function QrScannerModal({ open, onClose, onScanSuccess }: Props) {
     if (!file) return;
 
     setErrorMsg("");
-    // @ts-expect-error
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
         const img = new Image();
         img.src = URL.createObjectURL(file);
         await img.decode();
 
-        // @ts-expect-error
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
         const barcodes = await detector.detect(img);
 
         if (barcodes.length > 0) {
