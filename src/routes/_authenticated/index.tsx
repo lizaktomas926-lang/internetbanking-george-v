@@ -100,7 +100,7 @@ export default function GeorgePrehlad() {
         </div>
       </div>
 
-                  * 3. Vaše produkty & Plastická karta SPACE účtu */}
+               {/* 3. Vaše produkty & Plastická karta SPACE účtu */}
       <div className="mt-5 px-4 space-y-4">
         <div className="flex items-center justify-between px-1">
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
