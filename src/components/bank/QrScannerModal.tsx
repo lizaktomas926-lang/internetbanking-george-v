@@ -63,11 +63,10 @@ export function QrScannerModal({ open, onClose, onScanSuccess }: Props) {
 
   // Detekcia QR kódu z videa
   async function startDetection() {
-    // @ts-expect-error - natívne BarcodeDetector API v moderných prehliadačoch
+    // natívne BarcodeDetector API v moderných prehliadačoch
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       try {
-        // @ts-expect-error
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
 
         const interval = setInterval(async () => {
           if (!videoRef.current || !streamRef.current) {
