@@ -6,10 +6,14 @@ import userEvent from "@testing-library/user-event";
 
 const navigateMock = vi.fn();
 
-vi.mock("@tanstack/react-router", () => ({
-  createFileRoute: () => (opts: unknown) => opts,
-  useNavigate: () => navigateMock,
-}));
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
+  return {
+    ...actual,
+    createFileRoute: () => (opts: unknown) => opts,
+    useNavigate: () => navigateMock,
+  };
+});
 
 const addTransactionMock = vi.fn();
 const useBankMock = vi.fn();
@@ -35,7 +39,7 @@ vi.mock("@/components/bank/AppShell", () => ({
 }));
 
 // Import až po mockoch
-import Prijat from "./prijat";
+import Prijat from "@/routes/_authenticated/prijat";
 
 // --- Testy ------------------------------------------------------------------
 
@@ -52,6 +56,7 @@ const bankState = {
 describe("Obrazovka Prijať peniaze", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
     useBankMock.mockReturnValue(bankState);
     addTransactionMock.mockResolvedValue(undefined);
   });
