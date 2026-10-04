@@ -68,3 +68,20 @@ export const Overview = () => {
     </div>
   );
 };
+useEffect(() => {
+  const channel = supabase
+    .channel('schema-db-changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'transactions' },
+      (payload) => {
+        // Pri novej transakcii automaticky znova načítame dáta
+        fetchDashboardData();
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
