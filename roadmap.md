@@ -15,5 +15,4 @@
 
 - [x] Odomykanie aplikácie odtlačkom prsta / tvárou (zámka obrazovky)
 - [x] Ochrana prihlásených obrazoviek pred prázdnym zobrazením pri chybe načítania
-- [ ] Overiť prepínanie Prehľadu medzi denným a nočným režimom
-- [ ] Upraviť detail odoslanej platby podľa priloženej fotografie
+- [x] Upraviť detail odoslanej platby podľa priloženej fotografie
