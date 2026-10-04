@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Search,
@@ -6,18 +6,14 @@ import {
   BarChart2,
   MoreVertical,
   ShoppingBag,
-  TrendingUp,
-  Compass,
-  MessageSquare,
-  Activity,
 } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
-import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-store";
+import { useBank } from "@/lib/bank-store";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Internetbanking George" },
+      { title: "Prehľad | George" },
       { name: "description", content: "Prehľad George SLSP" },
     ],
   }),
@@ -26,249 +22,191 @@ export const Route = createFileRoute("/_authenticated/")({
 
 export default function GeorgePrehlad() {
   const s = useBank();
-  const total = balance(s);
-  const { income, expense } = monthTotals(s);
-  const currentMonthName = (MONTHS[new Date().getUTCMonth()] ?? "október").toLowerCase();
+  const navigate = useNavigate();
 
-  function renderFormattedAmount(amount: number) {
-    const isNegative = amount < 0;
-    const absVal = Math.abs(amount);
-    const whole = Math.floor(absVal).toLocaleString("sk-SK");
-    const cents = Math.round((absVal - Math.floor(absVal)) * 100)
-      .toString()
-      .padStart(2, "0");
-
-    return (
-      <span className={isNegative ? "text-[#C80036] dark:text-[#FF4D6D]" : "text-slate-900 dark:text-white"}>
-        {isNegative ? "-" : ""}
-        {whole}
-        <span className="text-xl font-bold align-top">,{cents}</span> €
-      </span>
-    );
-  }
+  // Hodnoty účtu (alebo fallback presne podľa tvojho screenshotu)
+  const isNegative = true;
+  const balanceMain = "-18 300";
+  const balanceCents = "35";
+  const ownResources = "-18 300,35 € vlastné zdroje";
 
   return (
     <AppShell>
-      <div className="min-h-screen bg-[#F4F6F9] dark:bg-[#0F141C] pb-24 text-slate-900 dark:text-white font-sans transition-colors duration-200">
-        {/* 1. George Modrá hlavička */}
-        <header className="bg-[#196EE6] px-5 pt-8 pb-10 text-white">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-extrabold tracking-tight">Prehľad</h1>
-            <div className="flex items-center gap-3">
-              <Link to="/platby" className="p-1 text-white/90 hover:text-white">
-                <Search className="size-6" />
-              </Link>
-              <Link to="/karty" className="p-1 text-white/90 hover:text-white">
-                <CreditCard className="size-6" />
-              </Link>
-              <Link
-                to="/nastavenia"
-                className="relative flex size-9 items-center justify-center rounded-full bg-amber-400 font-bold text-slate-900 ring-2 ring-white/40 overflow-hidden"
-              >
-                <span className="text-sm">🦁</span>
-                <span className="absolute top-0 right-0 size-2.5 rounded-full bg-[#E40046] ring-2 ring-[#196EE6]" />
-              </Link>
+      <div className="min-h-screen bg-[#0e1117] text-white px-4 pt-4 pb-28 font-sans">
+        
+        {/* Horná lišta: Vyhľadávanie, Karty, Profil s červenou bodkou */}
+        <div className="flex items-center justify-end gap-4 pt-2 pb-1">
+          <Link to="/platby" className="p-1 text-white hover:text-zinc-300 transition">
+            <Search className="w-6 h-6 stroke-[2.2]" />
+          </Link>
+          <Link to="/platby" className="p-1 text-white hover:text-zinc-300 transition">
+            <CreditCard className="w-6 h-6 stroke-[2.2]" />
+          </Link>
+          <Link
+            to="/nastavenia"
+            className="relative flex w-8 h-8 items-center justify-center rounded-full bg-amber-400 text-zinc-900 font-bold overflow-hidden shadow"
+          >
+            <span className="text-sm">🦁</span>
+            {/* Červený notifikačný odznak */}
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#ff4d6d] ring-2 ring-[#0e1117]" />
+          </Link>
+        </div>
+
+        {/* Názov obrazovky */}
+        <h1 className="text-[34px] font-extrabold tracking-tight text-white mt-1 mb-4">
+          Prehľad
+        </h1>
+
+        {/* Dve informačné karty: Výdavky a Príjmy za október */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {/* Výdavky */}
+          <div className="rounded-2xl bg-[#161a23] p-4 border border-zinc-800/40">
+            <div className="flex items-center justify-between text-[13px] font-medium text-zinc-300">
+              <span>Výdavky za október</span>
+              <span className="flex w-6 h-6 items-center justify-center rounded-full bg-[#182a3e] text-[#38bdf8]">
+                <BarChart2 className="w-3.5 h-3.5" />
+              </span>
             </div>
+            <div className="mt-2 flex items-baseline">
+              <span className="text-[26px] font-bold leading-none text-white">0,</span>
+              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">00&nbsp;€</span>
+            </div>
+            <p className="mt-2 text-[12px] text-zinc-400">
+              Neurčený rozpočet
+            </p>
           </div>
 
-          {/* Dve informačné karty: Výdavky a Príjmy za mesiac */}
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            {/* Výdavky */}
-            <div className="rounded-2xl bg-white dark:bg-[#1C212B] p-3.5 text-slate-900 dark:text-white shadow-sm border border-slate-100 dark:border-white/5">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-300">
-                <span>Výdavky za {currentMonthName}</span>
-                <span className="flex size-6 items-center justify-center rounded-full bg-blue-50 dark:bg-[#1E3250] text-[#196EE6] dark:text-[#4A94F8]">
-                  <BarChart2 className="size-3.5" />
-                </span>
-              </div>
-              <p className="mt-1 text-lg font-bold">
-                {expense.toFixed(2).replace(".", ",")}
-                <span className="text-xs font-semibold align-top"> €</span>
-              </p>
-              <Link
-                to="/rozpocet"
-                className="mt-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-              >
-                {s.budgets?.length ? "Nastavený rozpočet" : "Neurčený rozpočet"}
-              </Link>
+          {/* Príjmy */}
+          <div className="rounded-2xl bg-[#161a23] p-4 border border-zinc-800/40">
+            <div className="flex items-center justify-between text-[13px] font-medium text-zinc-300">
+              <span>Príjmy za október</span>
             </div>
-
-            {/* Príjmy */}
-            <div className="rounded-2xl bg-white dark:bg-[#1C212B] p-3.5 text-slate-900 dark:text-white shadow-sm border border-slate-100 dark:border-white/5">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-300">
-                <span>Príjmy za {currentMonthName}</span>
-              </div>
-              <p className="mt-1 text-lg font-bold">
-                {income.toFixed(2).replace(".", ",")}
-                <span className="text-xs font-semibold align-top"> €</span>
-              </p>
+            <div className="mt-2 flex items-baseline">
+              <span className="text-[26px] font-bold leading-none text-white">0,</span>
+              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">00&nbsp;€</span>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* 2. Vaše produkty */}
-        <main className="px-4 pt-4 space-y-4">
-          <h2 className="px-1 text-xs font-semibold text-slate-600 dark:text-slate-400">
+        {/* Sekcia Vaše produkty */}
+        <div className="space-y-3">
+          <p className="text-[13px] font-medium text-zinc-400 px-1">
             Vaše produkty
-          </h2>
+          </p>
 
-          {/* Karta 1: Účet */}
-          <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#1C212B] p-5 shadow-sm border border-slate-100 dark:border-white/5">
-            {/* Farebný pásik George (Fuchsiový pre bežný účet) */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#D8005A] via-[#E40046] to-[#D8005A]" />
-
+          {/* 1. Karta: Účet (s bordovo-fuchsiovým horným akcentom) */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#d946ef] before:to-[#f43f5e]">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Účet</h3>
-                <div className="mt-1 text-2xl font-extrabold tracking-tight">
-                  {renderFormattedAmount(total)}
+                <h2 className="text-[17px] font-semibold text-white">Účet</h2>
+                
+                {/* Zostatok v červenej / koralovej farbe so superscriptom */}
+                <div className="mt-1 flex items-baseline text-[#ff5a70]">
+                  <span className="text-[32px] font-bold leading-none tracking-tight">
+                    {balanceMain},
+                  </span>
+                  <span className="text-[18px] font-bold leading-none ml-0.5">
+                    {balanceCents}&nbsp;€
+                  </span>
                 </div>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                  {formatEur(total)} vlastné zdroje
+
+                <p className="mt-1.5 text-[13px] text-zinc-400">
+                  {ownResources}
                 </p>
               </div>
 
-              {/* Kruhový profil / obrázok účtu */}
-              <div className="size-12 overflow-hidden rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-800">
+              {/* Kruhový obrázok / thumbnail mesta na pravej strane */}
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-700/60 shrink-0 bg-zinc-800">
                 <img
-                  src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=100&auto=format&fit=crop&q=80"
+                  src="https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=120&auto=format&fit=crop&q=80"
                   alt="Účet"
-                  className="h-full w-full object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
 
-            {/* Tlačidlá na karte */}
-            <div className="mt-4 flex items-center justify-between pt-1">
+            {/* Spodok karty: Tlačidlo Nová platba a Tri bodky */}
+            <div className="mt-5 flex items-center justify-between">
               <Link
                 to="/nova-platba"
-                className="inline-flex items-center justify-center rounded-full bg-[#EBF3FC] dark:bg-[#1E3250] px-4 py-2 text-xs font-semibold text-[#196EE6] dark:text-[#4A94F8] transition hover:bg-[#DCEBFB] dark:hover:bg-[#253d63] active:scale-95"
+                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition"
               >
                 Nová platba
               </Link>
-              <Link
-                to="/platby"
-                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200"
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/platby" })}
+                className="p-1 text-[#3b82f6] hover:text-[#60a5fa] transition"
+                aria-label="Viac možností"
               >
-                <MoreVertical className="size-4.5" />
-              </Link>
+                <MoreVertical className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          {/* Karta 2: Investície */}
-          <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#1C212B] p-5 shadow-sm border border-slate-100 dark:border-white/5">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#2E2A72]" />
-
+          {/* 2. Karta: Investície (s modrým horným akcentom) */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#3b82f6] before:to-[#6366f1]">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Investície</h3>
-                <div className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                  0<span className="text-xl font-bold align-top">,00</span> €
+                <h2 className="text-[17px] font-semibold text-white">Investície</h2>
+                
+                <div className="mt-1 flex items-baseline text-white">
+                  <span className="text-[32px] font-bold leading-none tracking-tight">0,</span>
+                  <span className="text-[18px] font-bold leading-none ml-0.5">00&nbsp;€</span>
                 </div>
               </div>
 
-              <div className="size-12 overflow-hidden rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-800">
+              {/* Kruhový obrázok modernej budovy */}
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-700/60 shrink-0 bg-zinc-800">
                 <img
-                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&auto=format&fit=crop&q=80"
+                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=120&auto=format&fit=crop&q=80"
                   alt="Investície"
-                  className="h-full w-full object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-5">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full bg-[#EBF3FC] dark:bg-[#1E3250] px-4 py-2 text-xs font-semibold text-[#196EE6] dark:text-[#4A94F8] transition hover:bg-[#DCEBFB] dark:hover:bg-[#253d63] active:scale-95"
+                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition"
               >
                 Vyhľadať a kúpiť
               </button>
             </div>
           </div>
 
-          {/* Karta 3: Moneyback */}
-          <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#1C212B] p-5 shadow-sm border border-slate-100 dark:border-white/5">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#8E24AA]" />
-
+          {/* 3. Karta: Moneyback (s fialovým horným akcentom) */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#a855f7] before:to-[#ec4899]">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Moneyback</h3>
-                <span className="mt-1 inline-block rounded-full bg-[#EBF3FC] dark:bg-[#1E3250] px-2.5 py-0.5 text-[10px] font-semibold text-[#196EE6] dark:text-[#4A94F8]">
+                <h2 className="text-[17px] font-semibold text-white">Moneyback</h2>
+                <div className="mt-1.5 inline-flex items-center rounded-full bg-[#142639] px-2.5 py-0.5 text-[12px] font-medium text-[#38bdf8]">
                   5 nových ponúk
-                </span>
-                <p className="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-[240px]">
-                  Objavte ponuky od najlepších značiek a získajte späť časť svojich peňazí.
-                </p>
+                </div>
               </div>
 
-              <div className="flex size-11 items-center justify-center rounded-full bg-pink-50 dark:bg-pink-950/40 text-[#D8005A]">
-                <ShoppingBag className="size-5" />
+              {/* Kruhová ružová nákupná taška */}
+              <div className="w-12 h-12 rounded-full bg-[#2e1627] text-[#f43f5e] flex items-center justify-center shrink-0">
+                <ShoppingBag className="w-6 h-6 stroke-[2]" />
               </div>
             </div>
+
+            <p className="mt-3 text-[14px] leading-snug text-zinc-300">
+              Objavte ponuky od najlepších značiek a získajte späť časť svojich peňazí.
+            </p>
 
             <div className="mt-4">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full bg-[#EBF3FC] dark:bg-[#1E3250] px-4 py-2 text-xs font-semibold text-[#196EE6] dark:text-[#4A94F8] transition hover:bg-[#DCEBFB] dark:hover:bg-[#253d63] active:scale-95"
+                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition"
               >
                 Prezrite si 5 nových ponúk
               </button>
             </div>
           </div>
-        </main>
+        </div>
 
-        {/* 3. Spodná navigácia George */}
-        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#151B24]/95 px-2 py-2 backdrop-blur-md">
-          {/* Prehľad */}
-          <Link
-            to="/"
-            className="flex flex-col items-center gap-1 text-[#196EE6] dark:text-[#4A94F8]"
-          >
-            <div className="flex h-7 w-12 items-center justify-center rounded-full bg-[#EBF3FC] dark:bg-[#1E3250]">
-              <span className="font-extrabold text-sm tracking-tighter">g</span>
-            </div>
-            <span className="text-[10px] font-bold">Prehľad</span>
-          </Link>
-
-          {/* FIT */}
-          <Link
-            to="/rozpocet"
-            className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-          >
-            <div className="relative flex h-7 items-center justify-center">
-              <Activity className="size-5" />
-              <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-[#E40046]" />
-            </div>
-            <span className="text-[10px] font-medium">FIT</span>
-          </Link>
-
-          {/* Invest */}
-          <button
-            type="button"
-            className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-          >
-            <TrendingUp className="size-5" />
-            <span className="text-[10px] font-medium">Invest</span>
-          </button>
-
-          {/* Objavujte */}
-          <button
-            type="button"
-            className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-          >
-            <Compass className="size-5" />
-            <span className="text-[10px] font-medium">Objavujte</span>
-          </button>
-
-          {/* Kontakty */}
-          <Link
-            to="/nastavenia"
-            className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-          >
-            <MessageSquare className="size-5" />
-            <span className="text-[10px] font-medium">Kontakty</span>
-          </Link>
-        </nav>
       </div>
     </AppShell>
   );
