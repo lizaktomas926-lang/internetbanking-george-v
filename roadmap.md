@@ -15,3 +15,4 @@
 
 - [x] Odomykanie aplikácie odtlačkom prsta / tvárou (zámka obrazovky)
 - [x] Ochrana prihlásených obrazoviek pred prázdnym zobrazením pri chybe načítania
+- [x] Upraviť detail odoslanej platby podľa priloženej fotografie
