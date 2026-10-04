@@ -20,15 +20,25 @@ export const Route = createFileRoute("/_authenticated/")({
   component: GeorgePrehlad,
 });
 
+function splitAmount(n: number) {
+  const abs = Math.abs(n);
+  const whole = Math.floor(abs).toLocaleString("sk-SK");
+  const cents = (abs % 1).toFixed(2).slice(2);
+  return { whole, cents };
+}
+
 export default function GeorgePrehlad() {
   const s = useBank();
   const navigate = useNavigate();
 
-  // Hodnoty účtu (alebo fallback presne podľa tvojho screenshotu)
-  const isNegative = true;
-  const balanceMain = "-18 300";
-  const balanceCents = "35";
-  const ownResources = "-18 300,35 € vlastné zdroje";
+  // Skutočný zostatok a mesačné pohyby z údajov v cloude
+  const bal = balance(s);
+  const isNegative = bal < 0;
+  const { whole: balanceMain, cents: balanceCents } = splitAmount(bal);
+  const ownResources = `${formatEur(bal)} vlastné zdroje`;
+  const { income, expense } = monthTotals(s);
+  const exp = splitAmount(expense);
+  const inc = splitAmount(income);
 
   return (
     <AppShell>
