@@ -1,95 +1,70 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/integrations/supabase/client'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, CreditCard, Send, PlusCircle } from 'lucide-react'
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-export const Route = createFileRoute('/_authenticated/')({
-  component: PrehladPage,
-})
+export const Overview = () => {
+  const [account, setAccount] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-function PrehladPage() {
-  const navigate = useNavigate()
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
 
-  // 1. Načítanie reálneho zostatku používateľa zo Supabase cloudu
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile-balance'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      // 1. Načítanie zostatku na účte
+      const { data: accData, error: accError } = await supabase
+        .from('accounts')
+        .select('*')
+        .single();
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('balance, account_number')
-        .eq('id', user.id)
-        .single()
+      if (accError) console.error('Chyba účtu:', accError.message);
+      else setAccount(accData);
 
-      if (error) throw error
-      return data
-    },
-  })
+      // 2. Načítanie posledných transakcií z cloudu
+      const { data: txData, error: txError } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (txError) console.error('Chyba transakcií:', txError.message);
+      else setTransactions(txData || []);
+
+      setLoading(false);
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) return <div className="p-4">Načítavam Prehľad z cloudu...</div>;
 
   return (
-    <div className="p-4 space-y-6 max-w-2xl mx-auto">
-      {/* Hlavička */}
-      <div>
-        <h1 className="text-2xl font-bold">Prehľad účtu</h1>
-        <p className="text-muted-foreground text-sm">Vítajte v George bankingu</p>
+    <div className="space-y-6 p-4">
+      {/* Karta zostatku */}
+      <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
+        <span className="text-sm text-gray-500">Hlavný účet (IBAN)</span>
+        <div className="text-xs text-gray-400 mb-2">{account?.iban || 'SK88 0900 0000 0012 3456 7890'}</div>
+        <div className="text-3xl font-extrabold text-gray-900">
+          {account?.balance !== undefined ? `${account.balance.toFixed(2)} €` : '0.00 €'}
+        </div>
       </div>
 
-      {/* 2. Karta Účtu - Preklik na históriu transakcií */}
-      <Card 
-        onClick={() => navigate({ to: '/karty' })}
-        className="p-6 bg-card hover:bg-accent/50 cursor-pointer transition-all shadow-md border border-border"
-      >
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-full text-primary">
-              <CreditCard className="h-6 w-6" />
+      {/* Nedávne transakcie */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <h3 className="font-semibold text-lg mb-4">Posledné pohyby</h3>
+        <div className="divide-y divide-gray-100">
+          {transactions.map((tx) => (
+            <div key={tx.id} className="py-3 flex justify-between items-center">
+              <div>
+                <p className="font-medium text-gray-800">{tx.title || tx.category || 'Platba'}</p>
+                <p className="text-xs text-gray-400">{new Date(tx.created_at).toLocaleDateString()}</p>
+              </div>
+              <span className={`font-bold ${tx.amount < 0 ? 'text-red-500' : 'text-green-600'}`}>
+                {tx.amount > 0 ? `+${tx.amount.toFixed(2)}` : `${tx.amount.toFixed(2)}`} €
+              </span>
             </div>
-            <div>
-              <h2 className="font-semibold text-lg">Osobný účet</h2>
-              <p className="text-xs text-muted-foreground">
-                {profile?.account_number || 'SK83 0900 0000 0012 3456 7890'}
-              </p>
-            </div>
-          </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground" />
+          ))}
         </div>
-
-        {/* Reálny zostatok z cloudu */}
-        <div className="mt-4">
-          <p className="text-xs text-muted-foreground">Dostupný zostatok</p>
-          <p className="text-3xl font-extrabold text-primary">
-            {isLoading ? 'Načítavam...' : `${profile?.balance ?? '0.00'} €`}
-          </p>
-        </div>
-
-        <div className="mt-4 text-xs font-medium text-primary flex items-center gap-1">
-          Kliknutím zobrazíte históriu platieb a detail
-        </div>
-      </Card>
-
-      {/* Rýchle akcie */}
-      <div className="grid grid-cols-2 gap-4">
-        <Button 
-          onClick={() => navigate({ to: '/platby' })}
-          className="flex items-center gap-2 py-6"
-          variant="outline"
-        >
-          <Send className="h-4 w-4" />
-          Nová platba
-        </Button>
-        <Button 
-          onClick={() => navigate({ to: '/karty' })}
-          className="flex items-center gap-2 py-6"
-          variant="outline"
-        >
-          <PlusCircle className="h-4 w-4" />
-          História transakcií
-        </Button>
       </div>
     </div>
-  )
-}
+  );
+};
