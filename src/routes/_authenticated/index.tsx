@@ -101,14 +101,20 @@ export default function GeorgePrehlad() {
             Vaše produkty
           </p>
 
-          {/* 1. Karta: Účet (s bordovo-fuchsiovým horným akcentom) */}
-          <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#d946ef] before:to-[#f43f5e]">
+          {/* 1. Karta: Účet (s bordovo-fuchsiovým horným akcentom) — kliknutie otvorí históriu platieb */}
+          <Link
+            to="/platby"
+            className="block relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#d946ef] before:to-[#f43f5e] transition hover:border-zinc-700/60"
+          >
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-[17px] font-semibold text-white">Účet</h2>
-                
-                {/* Zostatok v červenej / koralovej farbe so superscriptom */}
-                <div className="mt-1 flex items-baseline text-[#ff5a70]">
+
+                {/* Skutočný zostatok z cloudu */}
+                <div className={`mt-1 flex items-baseline ${isNegative ? "text-[#ff5a70]" : "text-white"}`}>
+                  {isNegative && (
+                    <span className="text-[32px] font-bold leading-none tracking-tight">-</span>
+                  )}
                   <span className="text-[32px] font-bold leading-none tracking-tight">
                     {balanceMain},
                   </span>
@@ -132,24 +138,20 @@ export default function GeorgePrehlad() {
               </div>
             </div>
 
-            {/* Spodok karty: Tlačidlo Nová platba a Tri bodky */}
+            {/* Spodok karty: Tlačidlo Nová platba */}
             <div className="mt-5 flex items-center justify-between">
-              <Link
-                to="/nova-platba"
-                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition"
+              <span
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.location.assign("/nova-platba");
+                }}
+                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition cursor-pointer"
               >
                 Nová platba
-              </Link>
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/platby" })}
-                className="p-1 text-[#3b82f6] hover:text-[#60a5fa] transition"
-                aria-label="Viac možností"
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
+              </span>
             </div>
-          </div>
+          </Link>
 
           {/* 2. Karta: Investície (s modrým horným akcentom) */}
           <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#3b82f6] before:to-[#6366f1]">
