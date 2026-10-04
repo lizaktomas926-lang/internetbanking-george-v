@@ -38,6 +38,12 @@
   --color-expense: var(--expense);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-detail-background: var(--detail-background);
+  --color-detail-surface: var(--detail-surface);
+  --color-detail-muted: var(--detail-muted);
+  --color-detail-action: var(--detail-action);
+  --color-detail-action-surface: var(--detail-action-surface);
+  --color-detail-direction: var(--detail-direction);
   --font-display: var(--font-display);
   --font-sans: var(--font-body);
 }
@@ -46,6 +52,12 @@
   --radius: 1.125rem;
   --font-display: "Outfit", system-ui, sans-serif;
   --font-body: "Manrope", system-ui, sans-serif;
+  --detail-background: #141319;
+  --detail-surface: #211f28;
+  --detail-muted: #9998ac;
+  --detail-action: #4a96fa;
+  --detail-action-surface: #253249;
+  --detail-direction: #142f3d;
 
   /* Nočný režim (Dark mode) */
   --background: #0f141c;
@@ -81,6 +93,12 @@
 }
 
 .light {
+  --detail-background: var(--background);
+  --detail-surface: var(--surface);
+  --detail-muted: var(--muted-foreground);
+  --detail-action: var(--primary);
+  --detail-action-surface: var(--accent);
+  --detail-direction: var(--surface-2);
   /* Denný režim (Light mode presne podľa videa) */
   --background: #f4f6fa;
   --foreground: #111827;
