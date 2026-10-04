@@ -62,7 +62,7 @@ function seedTransactions() {
   const m = now.getUTCMonth() + 1;
   const pm = m === 1 ? 12 : m - 1;
   const py = m === 1 ? y - 1 : y;
-  const rows: Omit<Txn, "id">[] = [
+  const rows: Omit<Txn, "id">[] =[
    { type: "in", counterparty: "Počiatočný zostatok", amount: 41097.5, date: iso(py, pm, 1), category: "Ostatné príjmy" },
 category: "Ostatné príjmy" },
     { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(y, m, 5), category: "Mzda", vs: "0100" },
