@@ -2,7 +2,8 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Night mode is the default; settings opt into day mode with html.light. */
+@custom-variant dark (&:where(html:not(.light), html:not(.light) *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
