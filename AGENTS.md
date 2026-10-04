@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Theme state uses `html.light` for day mode and its absence for night mode; restore the saved choice at the root so all routes and dark variants share one source of truth.
