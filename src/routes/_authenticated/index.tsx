@@ -27,7 +27,6 @@ function splitAmount(n: number) {
 
 export default function GeorgePrehlad() {
   const s = useBank();
-  const navigate = useNavigate();
 
   // Skutočný zostatok a mesačné pohyby z údajov v cloude
   const bal = balance(s);
@@ -70,14 +69,14 @@ export default function GeorgePrehlad() {
           {/* Výdavky */}
           <div className="rounded-2xl bg-[#161a23] p-4 border border-zinc-800/40">
             <div className="flex items-center justify-between text-[13px] font-medium text-zinc-300">
-              <span>Výdavky za október</span>
+              <span>Výdavky za {MONTHS[new Date().getMonth()].toLowerCase()}</span>
               <span className="flex w-6 h-6 items-center justify-center rounded-full bg-[#182a3e] text-[#38bdf8]">
                 <BarChart2 className="w-3.5 h-3.5" />
               </span>
             </div>
             <div className="mt-2 flex items-baseline">
-              <span className="text-[26px] font-bold leading-none text-white">0,</span>
-              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">00&nbsp;€</span>
+              <span className="text-[26px] font-bold leading-none text-white">{exp.whole},</span>
+              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">{exp.cents}&nbsp;€</span>
             </div>
             <p className="mt-2 text-[12px] text-zinc-400">
               Neurčený rozpočet
@@ -87,11 +86,11 @@ export default function GeorgePrehlad() {
           {/* Príjmy */}
           <div className="rounded-2xl bg-[#161a23] p-4 border border-zinc-800/40">
             <div className="flex items-center justify-between text-[13px] font-medium text-zinc-300">
-              <span>Príjmy za október</span>
+              <span>Príjmy za {MONTHS[new Date().getMonth()].toLowerCase()}</span>
             </div>
             <div className="mt-2 flex items-baseline">
-              <span className="text-[26px] font-bold leading-none text-white">0,</span>
-              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">00&nbsp;€</span>
+              <span className="text-[26px] font-bold leading-none text-white">{inc.whole},</span>
+              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">{inc.cents}&nbsp;€</span>
             </div>
           </div>
         </div>
