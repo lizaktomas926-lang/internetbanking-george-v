@@ -1,14 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Search,
   CreditCard,
   BarChart2,
-  MoreVertical,
   ShoppingBag,
 } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
-import { useBank } from "@/lib/bank-store";
+import { useBank, balance, monthTotals, formatEur } from "@/lib/bank-store";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
