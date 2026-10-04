@@ -1,14 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import {
   Search,
   CreditCard,
   BarChart2,
-  MoreVertical,
   ShoppingBag,
 } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
-import { useBank } from "@/lib/bank-store";
+import { useBank, balance, monthTotals, formatEur, MONTHS } from "@/lib/bank-store";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -20,15 +18,25 @@ export const Route = createFileRoute("/_authenticated/")({
   component: GeorgePrehlad,
 });
 
+function splitAmount(n: number) {
+  const abs = Math.abs(n);
+  const whole = Math.floor(abs).toLocaleString("sk-SK");
+  const cents = (abs % 1).toFixed(2).slice(2);
+  return { whole, cents };
+}
+
 export default function GeorgePrehlad() {
   const s = useBank();
   const navigate = useNavigate();
 
-  // Hodnoty účtu (alebo fallback presne podľa tvojho screenshotu)
-  const isNegative = true;
-  const balanceMain = "-18 300";
-  const balanceCents = "35";
-  const ownResources = "-18 300,35 € vlastné zdroje";
+  // Skutočný zostatok a mesačné pohyby z údajov v cloude
+  const bal = balance(s);
+  const isNegative = bal < 0;
+  const { whole: balanceMain, cents: balanceCents } = splitAmount(bal);
+  const ownResources = `${formatEur(bal)} vlastné zdroje`;
+  const { income, expense } = monthTotals(s);
+  const exp = splitAmount(expense);
+  const inc = splitAmount(income);
 
   return (
     <AppShell>
@@ -62,14 +70,14 @@ export default function GeorgePrehlad() {
           {/* Výdavky */}
           <div className="rounded-2xl bg-[#161a23] p-4 border border-zinc-800/40">
             <div className="flex items-center justify-between text-[13px] font-medium text-zinc-300">
-              <span>Výdavky za október</span>
+              <span>Výdavky za {MONTHS[new Date().getMonth()].toLowerCase()}</span>
               <span className="flex w-6 h-6 items-center justify-center rounded-full bg-[#182a3e] text-[#38bdf8]">
                 <BarChart2 className="w-3.5 h-3.5" />
               </span>
             </div>
             <div className="mt-2 flex items-baseline">
-              <span className="text-[26px] font-bold leading-none text-white">0,</span>
-              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">00&nbsp;€</span>
+              <span className="text-[26px] font-bold leading-none text-white">{exp.whole},</span>
+              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">{exp.cents}&nbsp;€</span>
             </div>
             <p className="mt-2 text-[12px] text-zinc-400">
               Neurčený rozpočet
@@ -79,11 +87,11 @@ export default function GeorgePrehlad() {
           {/* Príjmy */}
           <div className="rounded-2xl bg-[#161a23] p-4 border border-zinc-800/40">
             <div className="flex items-center justify-between text-[13px] font-medium text-zinc-300">
-              <span>Príjmy za október</span>
+              <span>Príjmy za {MONTHS[new Date().getMonth()].toLowerCase()}</span>
             </div>
             <div className="mt-2 flex items-baseline">
-              <span className="text-[26px] font-bold leading-none text-white">0,</span>
-              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">00&nbsp;€</span>
+              <span className="text-[26px] font-bold leading-none text-white">{inc.whole},</span>
+              <span className="text-[16px] font-bold leading-none ml-0.5 text-white">{inc.cents}&nbsp;€</span>
             </div>
           </div>
         </div>
@@ -94,14 +102,20 @@ export default function GeorgePrehlad() {
             Vaše produkty
           </p>
 
-          {/* 1. Karta: Účet (s bordovo-fuchsiovým horným akcentom) */}
-          <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#d946ef] before:to-[#f43f5e]">
+          {/* 1. Karta: Účet (s bordovo-fuchsiovým horným akcentom) — kliknutie otvorí históriu platieb */}
+          <Link
+            to="/platby"
+            className="block relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#d946ef] before:to-[#f43f5e] transition hover:border-zinc-700/60"
+          >
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-[17px] font-semibold text-white">Účet</h2>
-                
-                {/* Zostatok v červenej / koralovej farbe so superscriptom */}
-                <div className="mt-1 flex items-baseline text-[#ff5a70]">
+
+                {/* Skutočný zostatok z cloudu */}
+                <div className={`mt-1 flex items-baseline ${isNegative ? "text-[#ff5a70]" : "text-white"}`}>
+                  {isNegative && (
+                    <span className="text-[32px] font-bold leading-none tracking-tight">-</span>
+                  )}
                   <span className="text-[32px] font-bold leading-none tracking-tight">
                     {balanceMain},
                   </span>
@@ -125,24 +139,21 @@ export default function GeorgePrehlad() {
               </div>
             </div>
 
-            {/* Spodok karty: Tlačidlo Nová platba a Tri bodky */}
+            {/* Spodok karty: Tlačidlo Nová platba */}
             <div className="mt-5 flex items-center justify-between">
-              <Link
-                to="/nova-platba"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  void navigate({ to: "/nova-platba" });
+                }}
                 className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition"
               >
                 Nová platba
-              </Link>
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/platby" })}
-                className="p-1 text-[#3b82f6] hover:text-[#60a5fa] transition"
-                aria-label="Viac možností"
-              >
-                <MoreVertical className="w-5 h-5" />
               </button>
             </div>
-          </div>
+          </Link>
 
           {/* 2. Karta: Investície (s modrým horným akcentom) */}
           <div className="relative overflow-hidden rounded-2xl bg-[#161a23] p-5 border border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#3b82f6] before:to-[#6366f1]">
