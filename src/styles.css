@@ -140,6 +140,12 @@
   background: var(--gradient-account);
 }
 
+.transaction-detail,
+.transaction-detail h1 {
+  font-family: Arial, system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
 
 @keyframes screen-enter {
   from {
