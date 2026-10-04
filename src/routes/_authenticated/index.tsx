@@ -93,8 +93,7 @@ export default function GeorgePrehlad() {
           <p className="text-[13px] font-medium text-zinc-400 px-1">
             Vaše produkty
           </p>
-
-                {/* 1. Karta: Účet — celá je klikateľná a otvára detail účtu / históriu */}
+                     {/* 1. Karta: Účet — celá je klikateľná a otvára detail účtu / históriu */}
           <Link
             to="/platby"
             className="group relative block overflow-hidden rounded-2xl bg-white dark:bg-[#161a23] p-5 shadow-sm border border-slate-100 dark:border-zinc-800/40 before:absolute before:inset-x-0 before:top-0 before:h-[3.5px] before:bg-gradient-to-r before:from-[#d946ef] before:to-[#f43f5e] active:scale-[0.99] hover:border-slate-200 dark:hover:border-zinc-700/60 transition-all cursor-pointer"
@@ -133,6 +132,14 @@ export default function GeorgePrehlad() {
             {/* Spodok karty */}
             <div className="mt-5 flex items-center justify-between">
               <span className="inline-flex items-center justify-center rounded-full bg-[#eef4ff] hover:bg-[#e0ecff] dark:bg-[#1b273d] dark:hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#196ee6] dark:text-[#60a5fa] transition">
+                Nová platba
+              </span>
+              <span className="p-1 text-[#196ee6] dark:text-[#38bdf8] opacity-80 group-hover:opacity-100 transition">
+                <MoreVertical className="w-5 h-5" />
+              </span>
+            </div>
+          </Link>
+
                 Nová platba
               </span>
               <span className="p-1 text-[#196ee6] dark:text-[#38bdf8] opacity-80 group-hover:opacity-100 transition">
