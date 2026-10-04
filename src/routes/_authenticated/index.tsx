@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Search,
   CreditCard,
@@ -6,7 +6,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
-import { useBank, balance, monthTotals, formatEur } from "@/lib/bank-store";
+import { useBank, balance, monthTotals, formatEur, MONTHS } from "@/lib/bank-store";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -27,6 +27,7 @@ function splitAmount(n: number) {
 
 export default function GeorgePrehlad() {
   const s = useBank();
+  const navigate = useNavigate();
 
   // Skutočný zostatok a mesačné pohyby z údajov v cloude
   const bal = balance(s);
@@ -140,16 +141,17 @@ export default function GeorgePrehlad() {
 
             {/* Spodok karty: Tlačidlo Nová platba */}
             <div className="mt-5 flex items-center justify-between">
-              <span
+              <button
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  window.location.assign("/nova-platba");
+                  void navigate({ to: "/nova-platba" });
                 }}
-                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition cursor-pointer"
+                className="inline-flex items-center justify-center rounded-full bg-[#1b273d] hover:bg-[#233454] px-4 py-2 text-[14px] font-medium text-[#60a5fa] transition"
               >
                 Nová platba
-              </span>
+              </button>
             </div>
           </Link>
 
