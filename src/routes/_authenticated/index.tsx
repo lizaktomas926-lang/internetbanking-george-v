@@ -44,10 +44,14 @@ export default function GeorgePrehlad() {
               <CreditCard className="w-6 h-6 stroke-[2.2]" />
             </Link>
             <Link
-              to="/nastavenia"
-              className="flex w-8 h-8 items-center justify-center rounded-full bg-amber-400 text-zinc-900 font-bold overflow-hidden shadow ring-2 ring-white/30"
-              aria-label="Profil"
-            >
+  to="/nastavenia"
+  className="relative flex w-8 h-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-xs tracking-wider shadow ring-2 ring-white/40 dark:ring-zinc-700 transition"
+  aria-label="Profil"
+>
+  <span>{initials}</span>
+  <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#ff4d6d] ring-2 ring-[#196ee6] dark:ring-[#0e1117]" />
+</Link>
+
               <span className="text-sm">🦁</span>
             </Link>
           </div>
