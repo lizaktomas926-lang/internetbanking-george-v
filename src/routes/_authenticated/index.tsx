@@ -12,12 +12,6 @@ export const Route = createFileRoute("/_authenticated/")({
   }),
   component: GeorgePrehlad,
 });
-
-function getInitials(name?: string | null, fallback = "G"): string {
-  if (!name || !name.trim()) return fallback;
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-}
 function getInitials(name?: string | null, fallback = "G"): string {
   if (!name || !name.trim()) return fallback;
   const parts = name.trim().split(/\s+/).filter(Boolean);
