@@ -1,30 +1,20 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, CreditCard, BarChart2, MoreVertical } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
 import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-store";
 
-export const Route = createFileRoute("/_authenticated/")({
-  head: () => ({
-    meta: [
-      { title: "Prehľad | George" },
-      { name: "description", content: "Internetbanking George Slovenská sporiteľňa" },
-    ],
-  }),
-  component: GeorgePrehlad,
-});
-
-function getInitials(name?: string | null, fallback = "G"): string {
+// Pomocná funkcia pre iniciály
+function formatInitials(name?: string | null, fallback = "G"): string {
   if (!name || !name.trim()) return fallback;
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export default function GeorgePrehlad() {
+function GeorgePrehlad() {
   const s = useBank();
   const total = balance(s);
-  const navigate = useNavigate();
-  const initials = getInitials(s.owner);
+  const userInitials = formatInitials(s.owner);
   const { income, expense } = monthTotals(s);
   const currentMonthName = (MONTHS[new Date().getUTCMonth()] ?? "tento mesiac").toLowerCase();
 
@@ -53,7 +43,7 @@ export default function GeorgePrehlad() {
               className="relative flex w-8 h-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 dark:bg-zinc-800 text-white font-bold text-xs tracking-wider shadow ring-2 ring-white/30 dark:ring-zinc-700 transition"
               aria-label="Profil"
             >
-              <span>{initials}</span>
+              <span>{userInitials}</span>
               <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#ff4d6d] ring-2 ring-[#196ee6] dark:ring-[#0e1117]" />
             </Link>
           </div>
@@ -146,3 +136,13 @@ export default function GeorgePrehlad() {
     </AppShell>
   );
 }
+
+export const Route = createFileRoute("/_authenticated/")({
+  head: () => ({
+    meta: [
+      { title: "Prehľad | George" },
+      { name: "description", content: "Internetbanking George Slovenská sporiteľňa" },
+    ],
+  }),
+  component: GeorgePrehlad,
+});
