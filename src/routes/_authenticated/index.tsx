@@ -51,8 +51,6 @@ export default function GeorgePrehlad() {
   <span>{initials}</span>
   <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#ff4d6d] ring-2 ring-[#196ee6] dark:ring-[#0e1117]" />
 </Link>
-
-              <span className="text-sm">🦁</span>
             </Link>
           </div>
 
