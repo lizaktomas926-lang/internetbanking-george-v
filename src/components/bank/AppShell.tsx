@@ -113,7 +113,7 @@ export function BrandHeader({
         ) : (
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-400">George</span>
         )}
-        {action}
+       už mi Ttčko Ttčko ttť55 4e {action}
       </div>
       <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
       {subtitle ? <p className="mt-1 text-xs text-slate-500 dark:text-zinc-400">{subtitle}</p> : null}
