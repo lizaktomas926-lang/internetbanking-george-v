@@ -1,136 +1,110 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, CreditCard, BarChart2, MoreVertical } from "lucide-react";
-import { AppShell } from "@/components/bank/AppShell";
-import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-store";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { Activity, TrendingUp, LayoutGrid, MessageSquare, ArrowLeft, Search, Plus, BarChart2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/")({
-  head: () => ({
-    meta: [
-      { title: "Prehľad | George" },
-      { name: "description", content: "Internetbanking George Slovenská sporiteľňa" },
-    ],
-  }),
-  component: GeorgePrehlad,
-});
+const navItems = [
+  { to: "/", label: "Prehľad", icon: null },
+  { to: "/rozpocet", label: "FIT", icon: Activity },
+  { to: "/sporenie", label: "Invest", icon: TrendingUp },
+  { to: "/karty", label: "Objavujte", icon: LayoutGrid },
+  { to: "/nastavenia", label: "Kontakty", icon: MessageSquare },
+] as const;
 
-export default function GeorgePrehlad() {
-  const s = useBank();
-  const total = balance(s);
-  const { income, expense } = monthTotals(s);
-  const currentMonthName = (MONTHS[new Date().getUTCMonth()] ?? "tento mesiac").toLowerCase();
-
-  const isNegative = total < 0;
-  const absVal = Math.abs(total);
-  const wholeEuros = Math.floor(absVal).toLocaleString("sk-SK");
-  const cents = Math.round((absVal - Math.floor(absVal)) * 100).toString().padStart(2, "0");
-
+export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <AppShell>
-      <div className="min-h-screen bg-[#f2f4f8] dark:bg-[#0e1117] text-slate-900 dark:text-white pb-28 font-sans transition-colors">
-        
-        {/* Modrá hlavička George (v noci tmavá) */}
-        <div className="bg-[#196ee6] dark:bg-transparent px-4 pt-3 pb-6 text-white transition-colors">
-          <div className="flex items-center justify-end gap-4 pt-1 pb-2">
-            <Link to="/platby" className="p-1 text-white hover:opacity-80 transition" aria-label="Hľadať">
-              <Search className="w-6 h-6 stroke-[2.2]" />
-            </Link>
-            <Link to="/karty" className="p-1 text-white hover:opacity-80 transition" aria-label="Karty">
-              <CreditCard className="w-6 h-6 stroke-[2.2]" />
-            </Link>
+    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background text-foreground pb-24">
+      {children}
+    </div>
+  );
+}
+
+export function PersistentBottomNav() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  if (path === "/nova-platba" || path.startsWith("/transakcia")) return null;
+
+  // Spodná lišta pre obrazovku Účet (/platby) a ďalšie podstránky
+  if (path !== "/") {
+    return createPortal(
+      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-[430px] items-center gap-2.5 border-t border-slate-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-[#161a23]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
+        <Link
+          to="/platby"
+          aria-label="Hľadať"
+          className="grid size-11 place-items-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 active:scale-95 transition"
+        >
+          <Search className="size-5 stroke-[2.2]" />
+        </Link>
+        <Link
+          to="/rozpocet"
+          aria-label="Štatistika"
+          className="grid size-11 place-items-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 active:scale-95 transition"
+        >
+          <BarChart2 className="size-5 stroke-[2.2]" />
+        </Link>
+        <Link
+          to="/nova-platba"
+          className="ml-auto flex h-11 items-center gap-2 rounded-full bg-[#196ee6] hover:bg-[#155ec4] px-5 text-[15px] font-semibold text-white shadow-sm active:scale-95 transition"
+        >
+          <Plus className="size-5 stroke-[2.4]" />
+          <span>Nová platba</span>
+        </Link>
+      </div>,
+      document.body,
+    );
+  }
+
+  // Spodná lišta pre Prehľad (/)
+  return createPortal(
+    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-slate-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-[#161a23]/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl">
+      <div className="grid grid-cols-5 px-1">
+        {navItems.map(({ to, label, icon: Icon }) => {
+          const active = to === "/" && path === "/";
+          return (
             <Link
-              to="/nastavenia"
-              className="flex w-8 h-8 items-center justify-center rounded-full bg-amber-400 text-zinc-900 font-bold overflow-hidden shadow ring-2 ring-white/30"
-              aria-label="Profil"
+              key={to}
+              to={to}
+              className={`flex flex-col items-center gap-1 py-1 text-[11px] ${
+                active ? "font-semibold text-[#196ee6] dark:text-[#38bdf8]" : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+              }`}
             >
-              <span className="text-sm">🦁</span>
+              <span className={`grid h-8 w-12 place-items-center rounded-full ${active ? "bg-[#edf4ff] dark:bg-[#182a3e]" : ""}`}>
+                {Icon ? <Icon className="size-5" /> : <span className="text-base font-extrabold leading-none">g</span>}
+              </span>
+              <span>{label}</span>
             </Link>
-          </div>
-
-          <h1 className="text-[34px] font-extrabold tracking-tight text-white mt-2 mb-4">
-            Prehľad
-          </h1>
-
-          {/* Karty: Výdavky a Príjmy */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-white dark:bg-[#161a23] p-4 text-slate-900 dark:text-white shadow-sm border border-slate-100/80 dark:border-zinc-800/40">
-              <div className="flex items-center justify-between text-[13px] font-medium text-slate-700 dark:text-zinc-300">
-                <span>Výdavky za {currentMonthName}</span>
-                <span className="flex w-6 h-6 items-center justify-center rounded-full bg-[#edf4ff] dark:bg-[#182a3e] text-[#196ee6] dark:text-[#38bdf8]">
-                  <BarChart2 className="w-3.5 h-3.5" />
-                </span>
-              </div>
-              <div className="mt-2 flex items-baseline">
-                <span className="text-[26px] font-bold leading-none">
-                  {Math.floor(expense).toLocaleString("sk-SK")},
-                </span>
-                <span className="text-[16px] font-bold leading-none ml-0.5">
-                  {Math.round((expense - Math.floor(expense)) * 100).toString().padStart(2, "0")}&nbsp;€
-                </span>
-              </div>
-              <Link to="/rozpocet" className="mt-2 block text-[12px] text-slate-500 dark:text-zinc-400 hover:underline">
-                {s.budgets?.length ? "Nastavený rozpočet" : "Neurčený rozpočet"}
-              </Link>
-            </div>
-
-            <div className="rounded-2xl bg-white dark:bg-[#161a23] p-4 text-slate-900 dark:text-white shadow-sm border border-slate-100/80 dark:border-zinc-800/40">
-              <div className="flex items-center justify-between text-[13px] font-medium text-slate-700 dark:text-zinc-300">
-                <span>Príjmy za {currentMonthName}</span>
-              </div>
-              <div className="mt-2 flex items-baseline">
-                <span className="text-[26px] font-bold leading-none text-[#16a34a] dark:text-[#22c55e]">
-                  {Math.floor(income).toLocaleString("sk-SK")},
-                </span>
-                <span className="text-[16px] font-bold leading-none ml-0.5 text-[#16a34a] dark:text-[#22c55e]">
-                  {Math.round((income - Math.floor(income)) * 100).toString().padStart(2, "0")}&nbsp;€
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Vaše produkty */}
-        <div className="px-4 mt-3 space-y-3">
-          <p className="text-[12px] font-bold tracking-wider text-slate-400 dark:text-zinc-500 uppercase px-1">
-            Vaše produkty
-          </p>
-
-          {/* Klikateľná celá karta Účet */}
-          <Link
-            to="/platby"
-            className="block rounded-2xl bg-white dark:bg-[#161a23] p-5 shadow-sm border-l-4 border-l-[#be0055] border-y border-r border-slate-100 dark:border-zinc-800/40 active:scale-[0.99] transition hover:shadow-md cursor-pointer"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-[17px] font-semibold text-slate-900 dark:text-white">Účet</h2>
-                <div className={`mt-1 flex items-baseline ${isNegative ? "text-[#e11d48] dark:text-[#ff5a70]" : "text-slate-900 dark:text-white"}`}>
-                  <span className="text-[32px] font-bold leading-none tracking-tight">
-                    {isNegative ? "-" : ""}{wholeEuros},
-                  </span>
-                  <span className="text-[20px] font-bold leading-none ml-0.5">
-                    {cents}&nbsp;€
-                  </span>
-                </div>
-                <p className="mt-1 text-[13px] text-slate-500 dark:text-zinc-400">
-                  {formatEur(total)} vlastné zdroje
-                </p>
-              </div>
-
-              <div className="w-10 h-10 rounded-full bg-[#196ee6] flex items-center justify-center text-white shrink-0 shadow-sm">
-                <span className="text-base font-bold">g</span>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800/60 flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-[#edf4ff] dark:bg-[#182a3e] px-4 py-1.5 text-[14px] font-semibold text-[#196ee6] dark:text-[#38bdf8]">
-                Nová platba
-              </span>
-              <span className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200">
-                <MoreVertical className="w-5 h-5" />
-              </span>
-            </div>
-          </Link>
-        </div>
+          );
+        })}
       </div>
-    </AppShell>
+    </nav>,
+    document.body,
+  );
+}
+
+export function BrandHeader({
+  title,
+  subtitle,
+  back,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  back?: boolean;
+  action?: ReactNode;
+}) {
+  return (
+    <header className="px-5 pt-6 pb-4">
+      <div className="flex items-center justify-between">
+        {back ? (
+          <Link to="/" className="p-2 -ml-2 rounded-full hover:bg-muted text-foreground">
+            <ArrowLeft className="size-5" />
+          </Link>
+        ) : (
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">George</span>
+        )}
+        {action}
+      </div>
+      <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+      {subtitle ? <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p> : null}
+    </header>
   );
 }
