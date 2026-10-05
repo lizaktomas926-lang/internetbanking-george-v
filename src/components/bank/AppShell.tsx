@@ -1,13 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Home, ArrowLeftRight, Compass, Settings, ArrowLeft } from "lucide-react";
+import { Activity, TrendingUp, LayoutGrid, MessageSquare, ArrowLeft, Search, Plus } from "lucide-react";
 
 const navItems = [
-  { to: "/", label: "Prehľad", icon: Home },
-  { to: "/platby", label: "Platby", icon: ArrowLeftRight },
-  { to: "/rozpocet", label: "Objavujte", icon: Compass },
-  { to: "/nastavenia", label: "Profil", icon: Settings },
+  { to: "/", label: "Prehľad", icon: null },
+  { to: "/rozpocet", label: "FIT", icon: Activity },
+  { to: "/sporenie", label: "Invest", icon: TrendingUp },
+  { to: "/karty", label: "Objavujte", icon: LayoutGrid },
+  { to: "/nastavenia", label: "Kontakty", icon: MessageSquare },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -20,21 +21,41 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 export function PersistentBottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  if (path === "/nova-platba" || path.startsWith("/transakcia")) return null;
+
+  if (path !== "/") {
+    return createPortal(
+      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-[430px] items-center gap-3 border-t border-border bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
+        <Link to="/platby" aria-label="Hľadať" className="grid size-12 place-items-center rounded-full bg-surface text-primary">
+          <Search className="size-6" />
+        </Link>
+        <Link
+          to="/nova-platba"
+          className="ml-auto flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-[16px] font-semibold text-primary-foreground"
+        >
+          <Plus className="size-5" /> Nová platba
+        </Link>
+      </div>,
+      document.body,
+    );
+  }
 
   return createPortal(
-    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-border bg-surface/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-4px_24px_rgb(0_0_0/0.06)] backdrop-blur-xl">
-      <div className="grid grid-cols-4 px-2">
+    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-border bg-surface/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl">
+      <div className="grid grid-cols-5 px-1">
         {navItems.map(({ to, label, icon: Icon }) => {
-          const active = to === "/" ? path === "/" : path.startsWith(to);
+          const active = to === "/" && path === "/";
           return (
             <Link
               key={to}
               to={to}
-              className={`flex flex-col items-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-colors ${
-                active ? "text-primary font-semibold" : "text-muted-foreground hover:text-foreground"
+              className={`flex flex-col items-center gap-1 py-1 text-[12px] ${
+                active ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Icon className="size-5" strokeWidth={active ? 2.3 : 1.8} />
+              <span className={`grid h-8 w-14 place-items-center rounded-full ${active ? "bg-primary/20" : ""}`}>
+                {Icon ? <Icon className="size-5" /> : <span className="text-lg font-extrabold leading-none">g</span>}
+              </span>
               <span>{label}</span>
             </Link>
           );
