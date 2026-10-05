@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Search, CreditCard, BarChart2, MoreVertical } from "lucide-react";
 import { AppShell } from "@/components/bank/AppShell";
 import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-store";
@@ -12,12 +12,14 @@ export const Route = createFileRoute("/_authenticated/")({
   }),
   component: GeorgePrehlad,
 });
+
 function getInitials(name?: string | null, fallback = "G"): string {
   if (!name || !name.trim()) return fallback;
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
+
 export default function GeorgePrehlad() {
   const s = useBank();
   const total = balance(s);
@@ -40,18 +42,19 @@ export default function GeorgePrehlad() {
           <div className="flex items-center justify-end gap-4 pt-1 pb-2">
             <Link to="/platby" className="p-1 text-white hover:opacity-80 transition" aria-label="Hľadať">
               <Search className="w-6 h-6 stroke-[2.2]" />
+            </Link>
+
             <Link to="/karty" className="p-1 text-white hover:opacity-80 transition" aria-label="Karty">
               <CreditCard className="w-6 h-6 stroke-[2.2]" />
             </Link>
-      <Link
-  to="/nastavenia"
-  className="relative flex w-8 h-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 dark:bg-zinc-800 text-white font-bold text-xs tracking-wider shadow ring-2 ring-white/30 dark:ring-zinc-700 transition"
-  aria-label="Profil"
->
-  <span>{initials}</span>
-  <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#ff4d6d] ring-2 ring-[#196ee6] dark:ring-[#0e1117]" />
-</Link>
 
+            <Link
+              to="/nastavenia"
+              className="relative flex w-8 h-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 dark:bg-zinc-800 text-white font-bold text-xs tracking-wider shadow ring-2 ring-white/30 dark:ring-zinc-700 transition"
+              aria-label="Profil"
+            >
+              <span>{initials}</span>
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#ff4d6d] ring-2 ring-[#196ee6] dark:ring-[#0e1117]" />
             </Link>
           </div>
 
