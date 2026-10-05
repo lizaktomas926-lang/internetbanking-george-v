@@ -39,7 +39,6 @@ export default function GeorgePrehlad() {
           <div className="flex items-center justify-end gap-4 pt-1 pb-2">
             <Link to="/platby" className="p-1 text-white hover:opacity-80 transition" aria-label="Hľadať">
               <Search className="w-6 h-6 stroke-[2.2]" />
-            </Link>
             <Link to="/karty" className="p-1 text-white hover:opacity-80 transition" aria-label="Karty">
               <CreditCard className="w-6 h-6 stroke-[2.2]" />
             </Link>
