@@ -28,6 +28,8 @@ function getInitials(name?: string | null, fallback = "G"): string {
 export default function GeorgePrehlad() {
   const s = useBank();
   const total = balance(s);
+  const navigate = useNavigate();
+  const initials = getInitials(s.owner);
   const { income, expense } = monthTotals(s);
   const currentMonthName = (MONTHS[new Date().getUTCMonth()] ?? "tento mesiac").toLowerCase();
 
