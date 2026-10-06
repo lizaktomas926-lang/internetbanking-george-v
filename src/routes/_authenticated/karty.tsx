@@ -1,57 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client'; // prípadne cesty podľa vášho projektu
+import { createFileRoute } from "@tanstack/react-router";
+import { CreditCard } from "lucide-react";
+import { AppShell, BrandHeader } from "@/components/bank/AppShell";
+import { useBank } from "@/lib/bank-store";
 
-export const CardsTab = () => {
-  const [cards, setCards] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+export const Route = createFileRoute("/_authenticated/karty")({
+  head: () => ({
+    meta: [
+      { title: "Moje karty | George" },
+      { name: "description", content: "Prehľad vašich platobných kariet v George." },
+      { property: "og:title", content: "Moje karty | George" },
+      { property: "og:description", content: "Prehľad vašich platobných kariet v George." },
+    ],
+  }),
+  component: CardsPage,
+});
 
-  useEffect(() => {
-    const fetchCards = async () => {
-      setLoading(true);
-      // Načítanie kariet zo Supabase tabuľky "cards"
-      const { data, error } = await supabase
-        .from('cards')
-        .select('*');
-
-      if (error) {
-        console.error('Chyba pri načítaní kariet:', error.message);
-      } else {
-        setCards(data || []);
-      }
-      setLoading(false);
-    };
-
-    fetchCards();
-  }, []);
-
-  if (loading) {
-    return <div className="p-4 text-center">Načítavam karty z cloudu...</div>;
-  }
+function CardsPage() {
+  const s = useBank();
+  const digits = (s.iban || "").replace(/\D/g, "");
+  const lastFour = digits.slice(-4) || "0000";
+  const holder = s.owner || "Majiteľ účtu";
+  const now = new Date();
+  const expiry = `${String(now.getMonth() + 1).padStart(2, "0")}/${String((now.getFullYear() + 4) % 100).padStart(2, "0")}`;
 
   return (
-    <div className="space-y-4 p-4">
-      <h2 className="text-xl font-bold">Moje Platebné Karty</h2>
-      {cards.length === 0 ? (
-        <p className="text-gray-500">Žiadne aktívne karty neboli nájdené.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {cards.map((card) => (
-            <div key={card.id} className="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
-              <div className="flex justify-between items-center mb-6">
-                <span className="font-semibold">{card.card_type || 'Debetná karta'}</span>
-                <span className="text-sm opacity-80">{card.status || 'Aktívna'}</span>
-              </div>
-              <div className="text-lg tracking-widest mb-4">
-                •••• •••• •••• {card.last_four || '1234'}
-              </div>
-              <div className="flex justify-between text-xs opacity-75">
-                <span>Platnosť: {card.expiry || '12/28'}</span>
-                <span>{card.holder_name || 'Tomáš Lizák'}</span>
-              </div>
-            </div>
-          ))}
+    <AppShell>
+      <BrandHeader title="Moje karty" subtitle="Platobné karty k vášmu účtu" back />
+      <div className="space-y-4 px-4">
+        <div className="rounded-2xl bg-gradient-to-br from-[#196ee6] to-[#0b3d91] p-5 text-white shadow-lg">
+          <div className="mb-8 flex items-center justify-between">
+            <span className="flex items-center gap-2 font-semibold">
+              <CreditCard className="size-5" /> Debetná karta VISA
+            </span>
+            <span className="text-xs opacity-80">Aktívna</span>
+          </div>
+          <div className="mb-4 text-lg tracking-widest">•••• •••• •••• {lastFour}</div>
+          <div className="flex justify-between text-xs opacity-80">
+            <span>Platnosť: {expiry}</span>
+            <span>{holder}</span>
+          </div>
         </div>
-      )}
-    </div>
+        <p className="px-1 text-xs text-muted-foreground">
+          Ďalšie karty si budete môcť objednať čoskoro.
+        </p>
+      </div>
+    </AppShell>
   );
-};
+}

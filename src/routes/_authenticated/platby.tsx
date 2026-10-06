@@ -78,7 +78,8 @@ export default function UcetDetail() {
 
     return Object.keys(groups)
       .sort((a, b) => b.localeCompare(a))
-      .map((k) => groups[k]);
+      .map((k) => groups[k])
+      .filter((g): g is { label: string; items: Txn[] } => Boolean(g));
   }, [s.transactions]);
 
   const copyIban = () => {
@@ -89,7 +90,7 @@ export default function UcetDetail() {
   };
 
   return (
-    <AppShell hideBottomNav={true}>
+    <AppShell>
       <div className="min-h-screen bg-[#f2f4f8] dark:bg-[#0e1117] text-slate-900 dark:text-white pb-28 font-sans transition-colors">
         
         {/* Fuchsiová hlavička s bielou šípkou späť */}
