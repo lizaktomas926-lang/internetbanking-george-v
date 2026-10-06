@@ -5,10 +5,12 @@ import { balance, formatEur, monthTotals, MONTHS, useBank } from "@/lib/bank-sto
 
 // Pomocná funkcia pre iniciály
 function formatInitials(name?: string | null, fallback = "G"): string {
-  if (!name || !name.trim()) return fallback;
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  const first = parts[0] ?? "";
+  const last = parts[parts.length - 1] ?? "";
+  if (!first) return fallback;
+  if (parts.length === 1) return first.slice(0, 2).toUpperCase();
+  return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
 }
 
 function GeorgePrehlad() {
@@ -137,11 +139,19 @@ function GeorgePrehlad() {
   );
 }
 
+const HOME_TITLE = "Internetbanking George";
+const HOME_DESC =
+  "Získajte s ním prehľad o svojich financiách 24 hodín denne, 7 dní v týždni. Rýchlo a pohodlne vybavte všetko, čo potrebujete.";
+
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Prehľad | George" },
-      { name: "description", content: "Internetbanking George Slovenská sporiteľňa" },
+      { title: HOME_TITLE },
+      { name: "description", content: HOME_DESC },
+      { property: "og:title", content: HOME_TITLE },
+      { property: "og:description", content: HOME_DESC },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: GeorgePrehlad,
