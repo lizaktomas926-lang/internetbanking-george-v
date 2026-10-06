@@ -222,7 +222,7 @@ export default function UcetDetail() {
                         return (
                           <div
                             key={t.id}
-                            onClick={() => navigate({ to: `/transakcia/${t.id}` as any })}
+                            onClick={() => navigate({ to: "/transakcia/$id", params: { id: t.id } })}
                             className="cursor-pointer flex items-center justify-between rounded-2xl bg-white dark:bg-[#161a23] p-4 shadow-sm border border-slate-100 dark:border-zinc-800/40 hover:bg-slate-50 dark:hover:bg-[#1c212c] transition"
                           >
                             <div className="flex items-center gap-3">
