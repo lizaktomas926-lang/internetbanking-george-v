@@ -58,21 +58,22 @@ function randomIban() {
 
 function seedTransactions() {
   const now = new Date();
-  const y = now.getUTCFullYear();
-  const m = now.getUTCMonth() + 1;
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
   const pm = m === 1 ? 12 : m - 1;
   const py = m === 1 ? y - 1 : y;
+  
   const rows: Omit<Txn, "id">[] = [
     { type: "in", counterparty: "Počiatočný zostatok", amount: 41097.5, date: iso(py, pm, 1), category: "Ostatné príjmy" },
-    { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(y, m, 5), category: "Mzda", vs: "0100" },
-    { type: "out", counterparty: "Billa", amount: 68.4, date: iso(y, m, 7), category: "Potraviny" },
-    { type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(y, m, 8), category: "Bývanie" },
-    { type: "in", counterparty: "Radina Olha", iban: "SK42 1100 0000 0029 3633 0786", amount: 120, date: iso(y, m, 11), category: "Ostatné príjmy", note: "Vrátenie pôžičky" },
-    { type: "out", counterparty: "Poplatok za vedenie účtu", amount: 7, date: iso(y, m, 12), category: "Poplatky", vs: "0898" },
-    { type: "out", counterparty: "Slovnaft", amount: 52.1, date: iso(y, m, 14), category: "Doprava" },
     { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(py, pm, 5), category: "Mzda" },
     { type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(py, pm, 8), category: "Bývanie" },
     { type: "out", counterparty: "Kino Lumière", amount: 18, date: iso(py, pm, 19), category: "Zábava" },
+    { type: "out", counterparty: "Billa", amount: 68.4, date: iso(y, m, 1), category: "Potraviny" },
+    { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(y, m, 2), category: "Mzda", vs: "0100" },
+    { type: "out", counterparty: "Nájom · Byt Petržalka", amount: 520, date: iso(y, m, 3), category: "Bývanie" },
+    { type: "in", counterparty: "Radina Olha", iban: "SK42 1100 0000 0029 3633 0786", amount: 120, date: iso(y, m, 4), category: "Ostatné príjmy", note: "Vrátenie pôžičky" },
+    { type: "out", counterparty: "Poplatok za vedenie účtu", amount: 7, date: iso(y, m, 5), category: "Poplatky", vs: "0898" },
+    { type: "out", counterparty: "Slovnaft", amount: 52.1, date: iso(y, m, 6), category: "Doprava" },
   ];
   return rows;
 }
@@ -240,6 +241,34 @@ export async function addTransaction(t: Omit<Txn, "id">) {
     })
     .select("id")
     .maybeSingle();
+export async function addTransaction(t: Omit<Txn, "id">) {
+  const userId = await currentUserId();
+  if (!userId) return;
+  const { data } = await supabase
+    .from("transactions")
+    .insert({
+      user_id: userId,
+      type: t.type,
+      counterparty: t.counterparty,
+      iban: t.iban ?? null,
+      amount: t.amount,
+      date: t.date,
+      category: t.category,
+      note: t.note ?? null,
+      vs: t.vs ?? null,
+    })
+    .select("id")
+    .maybeSingle();
+
+  const newTxn = { ...t, id: data?.id ?? crypto.randomUUID() };
+  // Vložíme a ihneď zoradíme od najnovších po najstaršie
+  state.transactions = [newTxn, ...state.transactions].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  emit();
+
+  void announceTransaction(newTxn);
+}
 
   state.transactions = [{ ...t, id: data?.id ?? crypto.randomUUID() }, ...state.transactions];
   emit();
