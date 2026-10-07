@@ -62,7 +62,7 @@ function seedTransactions() {
   const m = now.getMonth() + 1;
   const pm = m === 1 ? 12 : m - 1;
   const py = m === 1 ? y - 1 : y;
-  
+
   const rows: Omit<Txn, "id">[] = [
     { type: "in", counterparty: "Počiatočný zostatok", amount: 41097.5, date: iso(py, pm, 1), category: "Ostatné príjmy" },
     { type: "in", counterparty: "Mzda · Karavela s.r.o.", amount: 1840, date: iso(py, pm, 5), category: "Mzda" },
@@ -169,17 +169,19 @@ export async function loadAll() {
   state = {
     owner: profile?.owner ?? "",
     iban: profile?.iban ?? "",
-    transactions: (txns.data ?? []).map((r) => ({
-      id: r.id,
-      type: r.type === "in" ? "in" : "out",
-      counterparty: r.counterparty,
-      iban: r.iban ?? undefined,
-      amount: num(r.amount),
-      date: r.date,
-      category: r.category,
-      note: r.note ?? undefined,
-      vs: r.vs ?? undefined,
-    })),
+    transactions: (txns.data ?? [])
+      .map((r) => ({
+        id: r.id,
+        type: r.type === "in" ? "in" : "out",
+        counterparty: r.counterparty,
+        iban: r.iban ?? undefined,
+        amount: num(r.amount),
+        date: r.date,
+        category: r.category,
+        note: r.note ?? undefined,
+        vs: r.vs ?? undefined,
+      }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     goals: (goals.data ?? []).map((g) => ({ id: g.id, name: g.name, target: num(g.target), saved: num(g.saved) })),
     budgets: (budgets.data ?? []).map((b) => ({ category: b.category, limit: num(b.limit_amount) })),
     loading: false,
@@ -241,39 +243,14 @@ export async function addTransaction(t: Omit<Txn, "id">) {
     })
     .select("id")
     .maybeSingle();
-export async function addTransaction(t: Omit<Txn, "id">) {
-  const userId = await currentUserId();
-  if (!userId) return;
-  const { data } = await supabase
-    .from("transactions")
-    .insert({
-      user_id: userId,
-      type: t.type,
-      counterparty: t.counterparty,
-      iban: t.iban ?? null,
-      amount: t.amount,
-      date: t.date,
-      category: t.category,
-      note: t.note ?? null,
-      vs: t.vs ?? null,
-    })
-    .select("id")
-    .maybeSingle();
 
   const newTxn = { ...t, id: data?.id ?? crypto.randomUUID() };
-  // Vložíme a ihneď zoradíme od najnovších po najstaršie
   state.transactions = [newTxn, ...state.transactions].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   emit();
 
   void announceTransaction(newTxn);
-}
-
-  state.transactions = [{ ...t, id: data?.id ?? crypto.randomUUID() }, ...state.transactions];
-  emit();
-
-  void announceTransaction({ ...t, id: data?.id ?? "" });
 }
 
 async function announceTransaction(t: Txn) {
@@ -371,7 +348,7 @@ export function balance(s: BankState) {
 
 export function inMonth(t: Txn, d = new Date()) {
   const x = new Date(t.date);
-  return x.getUTCFullYear() === d.getUTCFullYear() && x.getUTCMonth() === d.getUTCMonth();
+  return x.getFullYear() === d.getFullYear() && x.getMonth() === d.getMonth();
 }
 
 export function monthTotals(s: BankState, d = new Date()) {
@@ -406,15 +383,17 @@ export function formatEur(n: number) {
 
 export function formatDate(iso: string) {
   const d = new Date(iso);
-  return `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${d.getUTCFullYear()}`;
+  return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
 }
 
 export function groupByMonth(txns: Txn[]) {
   const map = new Map<string, Txn[]>();
-  const sorted = [...txns].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = [...txns].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
   for (const t of sorted) {
     const d = new Date(t.date);
-    const key = `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+    const key = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(t);
   }
