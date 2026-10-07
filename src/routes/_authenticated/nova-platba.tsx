@@ -87,7 +87,7 @@ export default function NovaPlatba() {
         }
       }
 
-      addTransaction({
+     await addTransaction({
         type: "out",
         counterparty: name.trim(),
         iban: iban.trim().toUpperCase(),
