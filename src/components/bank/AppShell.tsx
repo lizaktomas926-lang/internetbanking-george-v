@@ -1,19 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Activity, TrendingUp, LayoutGrid, MessageSquare, ArrowLeft, Search, Plus, BarChart2 } from "lucide-react";
-
-const navItems = [
-  { to: "/", label: "Prehľad", icon: null },
-  { to: "/rozpocet", label: "FIT", icon: Activity },
-  { to: "/sporenie", label: "Invest", icon: TrendingUp },
-  { to: "/karty", label: "Objavujte", icon: LayoutGrid },
-  { to: "/nastavenia", label: "Kontakty", icon: MessageSquare },
-] as const;
+import { Home, Banknote, Plus, PieChart, Menu, ArrowLeft } from "lucide-react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background text-foreground pb-24">
+    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background text-foreground pb-24 font-sans">
       {children}
     </div>
   );
@@ -21,59 +13,84 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 export function PersistentBottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  if (path === "/nova-platba" || path.startsWith("/transakcia")) return null;
 
-  // Spodná lišta pre obrazovku Účet (/platby) a ďalšie podstránky
-  if (path !== "/") {
-    return createPortal(
-      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-[430px] items-center gap-2.5 border-t border-slate-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-[#161a23]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
-        <Link
-          to="/platby"
-          aria-label="Hľadať"
-          className="grid size-11 place-items-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 active:scale-95 transition"
-        >
-          <Search className="size-5 stroke-[2.2]" />
-        </Link>
-        <Link
-          to="/rozpocet"
-          aria-label="Štatistika"
-          className="grid size-11 place-items-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 active:scale-95 transition"
-        >
-          <BarChart2 className="size-5 stroke-[2.2]" />
-        </Link>
-        <Link
-          to="/nova-platba"
-          className="ml-auto flex h-11 items-center gap-2 rounded-full bg-[#196ee6] hover:bg-[#155ec4] px-5 text-[15px] font-semibold text-white shadow-sm active:scale-95 transition"
-        >
-          <Plus className="size-5 stroke-[2.4]" />
-          <span>Nová platba</span>
-        </Link>
-      </div>,
-      document.body,
-    );
+  // Skryť na obrazovke zadávania platby a v detaile transakcie
+  if (path === "/nova-platba" || path.startsWith("/transakcia")) {
+    return null;
   }
 
-  // Spodná lišta pre Prehľad (/)
+  const isPrehlad = path === "/";
+  const isPlatby = path === "/platby";
+  const isRozpocet = path === "/rozpocet";
+  const isViac = path === "/nastavenia" || path === "/karty" || path === "/sporenie" || path === "/upozornenia";
+
   return createPortal(
-    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-slate-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-[#161a23]/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl">
-      <div className="grid grid-cols-5 px-1">
-        {navItems.map(({ to, label, icon: Icon }) => {
-          const active = to === "/" && path === "/";
-          return (
-            <Link
-              key={to}
-              to={to}
-              className={`flex flex-col items-center gap-1 py-1 text-[11px] ${
-                active ? "font-semibold text-[#196ee6] dark:text-[#38bdf8]" : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              <span className={`grid h-8 w-12 place-items-center rounded-full ${active ? "bg-[#edf4ff] dark:bg-[#182a3e]" : ""}`}>
-                {Icon ? <Icon className="size-5" /> : <span className="text-base font-extrabold leading-none">g</span>}
-              </span>
-              <span>{label}</span>
-            </Link>
-          );
-        })}
+    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[430px] border-t border-slate-200/70 dark:border-zinc-800/80 bg-white/95 dark:bg-[#12161f]/95 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl shadow-lg transition-colors">
+      <div className="grid grid-cols-5 items-end px-2">
+        
+        {/* 1. Prehľad */}
+        <Link
+          to="/"
+          className={`flex flex-col items-center py-1 text-[11px] transition ${
+            isPrehlad
+              ? "font-bold text-[#196ee6] dark:text-[#38bdf8]"
+              : "text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200"
+          }`}
+        >
+          <Home className={`w-5 h-5 mb-1 ${isPrehlad ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
+          <span>Prehľad</span>
+        </Link>
+
+        {/* 2. Platby */}
+        <Link
+          to="/platby"
+          className={`flex flex-col items-center py-1 text-[11px] transition ${
+            isPlatby
+              ? "font-bold text-[#196ee6] dark:text-[#38bdf8]"
+              : "text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200"
+          }`}
+        >
+          <Banknote className={`w-5 h-5 mb-1 ${isPlatby ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
+          <span>Platby</span>
+        </Link>
+
+        {/* 3. Stredové vyvýšené tlačidlo '+' */}
+        <div className="flex justify-center -mt-5">
+          <Link
+            to="/nova-platba"
+            aria-label="Nová platba"
+            className="w-13 h-13 rounded-full bg-[#196ee6] hover:bg-[#155ec4] text-white flex items-center justify-center shadow-lg shadow-[#196ee6]/35 active:scale-95 transition-all"
+          >
+            <Plus className="w-7 h-7 stroke-[2.6]" />
+          </Link>
+        </div>
+
+        {/* 4. Rozpočet */}
+        <Link
+          to="/rozpocet"
+          className={`flex flex-col items-center py-1 text-[11px] transition ${
+            isRozpocet
+              ? "font-bold text-[#196ee6] dark:text-[#38bdf8]"
+              : "text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200"
+          }`}
+        >
+          <PieChart className={`w-5 h-5 mb-1 ${isRozpocet ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
+          <span>Rozpočet</span>
+        </Link>
+
+        {/* 5. Viac (Nastavenia) */}
+        <Link
+          to="/nastavenia"
+          className={`flex flex-col items-center py-1 text-[11px] transition ${
+            isViac
+              ? "font-bold text-[#196ee6] dark:text-[#38bdf8]"
+              : "text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200"
+          }`}
+        >
+          <Menu className={`w-5 h-5 mb-1 ${isViac ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
+          <span>Viac</span>
+        </Link>
+
       </div>
     </nav>,
     document.body,
